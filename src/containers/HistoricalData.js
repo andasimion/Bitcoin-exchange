@@ -1,15 +1,26 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { Layout } from 'antd';
 import SideMenu from '../components/SideMenu';
 import BitcoinInUSD from '../components/BitcoinInUSD';
 import DateSelector from '../components/DateSelector';
+import getLatestBTCExchangeRate from '../apiCalls';
 
 const { Header, Footer, Sider, Content } = Layout;
 
-const HistoricalDataPage = () => {
+class HistoricalData extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { 
+      bitcoinInUSD: null,
+      lastUpdated: null,
+    };
+    getLatestBTCExchangeRate((latestBTCExchangeRate) => this.setState(latestBTCExchangeRate));
+  }
+  
+  render() {
     return (
         <React.Fragment>
-        <Layout>
+        <Layout style={{height:"100vh"}}>
             <Header style={{ background: '#9099A2', textAlign: 'center'}}>Bitcoin currency</Header>
             <Layout>
               <Sider width={200} style={{ background: '#000' }}>
@@ -18,8 +29,9 @@ const HistoricalDataPage = () => {
               <Layout>
                 <Content style={{ background: '#fff', padding: 24, margin: 0, minHeight: 280 }}>
                   <React.Fragment>
-                    <BitcoinInUSD />  
+                    <BitcoinInUSD value={this.state.bitcoinInUSD} lastUpdated={this.state.lastUpdated}/>  
                   </React.Fragment>
+                  <br/>
                   <React.Fragment>
                     <DateSelector />
                   </React.Fragment>
@@ -30,6 +42,7 @@ const HistoricalDataPage = () => {
         </Layout>
       </React.Fragment>
     );
+  }
 }
 
-export default HistoricalDataPage;
+export default HistoricalData;

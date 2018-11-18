@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ErrorPage = () => {
+const Error404 = () => {
     return (
         <React.Fragment>
             <img src={window.location.origin + '/img/404error.jpg'} alt="404 Page Not Found!" />
@@ -8,4 +8,4 @@ const ErrorPage = () => {
     );
 }
 
-export default ErrorPage;
+export default Error404;
