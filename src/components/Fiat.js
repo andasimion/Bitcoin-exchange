@@ -3,15 +3,12 @@ import { Select } from 'antd';
 
 const Option = Select.Option;
 
-const Fiat = () => {
-    function handleChange(value) {
-        console.log(`selected ${value}`);
-    }
+const Fiat = (props) => {
 
     return (
         <React.Fragment>
             <span>Fiat </span> 
-            <Select defaultValue="USD" style={{ width: 120 }} onChange={handleChange}>
+            <Select defaultValue={props.fiatCurrency} style={{ width: 120 }} onChange={props.handleChange}>
                 <Option value="USD">USD</Option>
                 <Option value="RON">RON</Option>
                 <Option value="EUR">EUR</Option>

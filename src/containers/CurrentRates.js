@@ -8,18 +8,22 @@ class CurrentRates extends Component {
     constructor(props) {
       super(props);
       this.state = { 
-        bitcoinInUSD: null,
         lastUpdated: null,
-        targetCurrency: "USD",
-        exchangeRate: null,
+        exchangeRates: {
+            USD: null,
+            RON: null,
+            EUR: null,
+            BGP: null
+        }
       };
-      getLatestBTCExchangeRate((latestBTCExchangeRate) => this.setState(latestBTCExchangeRate));
+      getLatestBTCExchangeRate((latestBTCExchangeRate) => 
+      this.setState(prevState => {lastUpdated: null, exchangeRates: prevState.exchangeRates});
     }
 
     render() {
         return (
             <>
-                {this.props.children}
+                <Calculator exchangeRates={this.state.exchangeRates} lastUpdated={this.state.lastUpdated}/>
             </>    
         )
     }
