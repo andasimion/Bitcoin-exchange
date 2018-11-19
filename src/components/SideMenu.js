@@ -3,9 +3,9 @@ import { Menu, Icon } from 'antd';
 import { NavLink } from 'react-router-dom';
 
 
-const SideMenu = () => {
+const SideMenu = (props) => {
     return (
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
+        <Menu theme="dark" mode="inline" defaultSelectedKeys={props.defaultSelectedKeys}>
             <Menu.Item key="1">
                 <NavLink to="/">
                     <Icon type="calculator" />

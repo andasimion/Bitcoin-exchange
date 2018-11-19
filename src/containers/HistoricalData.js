@@ -24,7 +24,7 @@ class HistoricalData extends Component {
             <Header style={{ background: '#9099A2', textAlign: 'center'}}>Bitcoin currency</Header>
             <Layout>
               <Sider width={200} style={{ background: '#000' }}>
-              <SideMenu />
+              <SideMenu defaultSelectedKeys={['2']}/>
               </Sider>  
               <Layout>
                 <Content style={{ background: '#fff', padding: 24, margin: 0, minHeight: 280 }}>
