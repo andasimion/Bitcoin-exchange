@@ -6,8 +6,9 @@ import Calculator from './containers/Calculator';
 import HistoricalData from './containers/HistoricalData';
 import Error404 from './containers/Error404';
 import './App.css';
+import CurrentRates from './containers/CurrentRates';
 
-const { Header, Footer, Sider } = Layout;
+const { Header, Content, Footer, Sider } = Layout;
 
 class App extends Component {
   
@@ -22,11 +23,15 @@ class App extends Component {
                   <Sider width={200} style={{ background: '#000' }}>
                     <SideMenu />
                   </Sider> 
-                  <Switch>
-                    <Route path="/" component={Calculator} exact/>
-                    <Route path="/historicalData" component={HistoricalData} />
-                    <Route component={Error404} />
-                  </Switch>
+                  <Content style={{ background: '#fff', padding: 24, margin: 0, minHeight: 280 }}>
+                    <Switch>
+                      <CurrentRates>
+                        <Route path="/" component={Calculator} exact/>
+                        <Route path="/historicalData" component={HistoricalData} /> 
+                      </CurrentRates>   
+                      <Route component={Error404} />
+                    </Switch>
+                  </Content>
                 </>
               </BrowserRouter>
             </Layout>
