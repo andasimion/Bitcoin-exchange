@@ -13,16 +13,22 @@ class Calculator extends Component {
       fiatAmount: null
     };
   this.setNewFiatCurrency = this.setNewFiatCurrency.bind(this);
-  this.convertBitcoinToFiat  = this.convertBitcoinToFiat .bind(this);
+  this.convertBitcoinToFiat  = this.convertBitcoinToFiat.bind(this);
+  this.convertFiatToBitcoin  = this.convertFiatToBitcoin.bind(this);
   }
 
   setNewFiatCurrency = (value) => {
     this.setState({currentFiat: value})
-    console.log(this.state);
-  };
+  }
 
   convertBitcoinToFiat = (bitcoinAmount) => {
     let fiatAmount = bitcoinAmount * this.props.exchangeRates[this.state.currentFiat];
+    console.log(this.props.exchangeRates[this.state.currentFiat])
+    this.setState({bitcoinAmount, fiatAmount});
+  }
+
+  convertFiatToBitcoin = (fiatAmount) => {
+    let bitcoinAmount = fiatAmount / this.props.exchangeRates[this.state.currentFiat];
     this.setState({bitcoinAmount, fiatAmount});
   }
 
@@ -34,7 +40,7 @@ class Calculator extends Component {
         </div>
         <br/>
         <div>
-          <BitcoinInUSD />  
+          <BitcoinInUSD value={this.props.exchangeRates.USD} lastUpdated={this.props.lastUpdated}/>  
         </div>
         <br/>
         <div>

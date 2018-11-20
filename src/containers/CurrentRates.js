@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
+import { Route, Switch } from 'react-router-dom';
 import HistoricalData from './HistoricalData';
 import Calculator from './Calculator';
-import getLatestBTCExchangeRate from '../apiCalls';
+import Error404 from './Error404';
+import { getLatestBTCInUSDExchangeRate, getLatestBTCInFiatExchangeRate } from '../apiCalls';
 
 
 class CurrentRates extends Component {
@@ -13,17 +15,30 @@ class CurrentRates extends Component {
             USD: null,
             RON: null,
             EUR: null,
-            BGP: null
+            GBP: null
         }
       };
-      getLatestBTCExchangeRate((latestBTCExchangeRate) => 
-      this.setState(prevState => {lastUpdated: null, exchangeRates: prevState.exchangeRates});
+
+      getLatestBTCInUSDExchangeRate (lastUpdated => this.setState({lastUpdated}) )
+      
+      for (let fiat in this.state.exchangeRates) {
+        getLatestBTCInFiatExchangeRate (fiat, fiatValue => this.setState(prevState => {let exchangeRates = prevState.exchangeRates;
+                                                                          exchangeRates[fiat] = fiatValue;
+                                                                          return {exchangeRates}  
+            }
+          )
+        );
+      } 
     }
 
     render() {
         return (
             <>
-                <Calculator exchangeRates={this.state.exchangeRates} lastUpdated={this.state.lastUpdated}/>
+            <Switch>
+                <Route path="/" render={(props) => <Calculator {...props} exchangeRates={this.state.exchangeRates} lastUpdated={this.state.lastUpdated} />} exact/>
+                <Route path="/historicalData" render={(props) => <HistoricalData {...props} lastUpdated={this.state.lastUpdated} value={this.state.exchangeRates["USD"]} />} /> 
+                <Route component={Error404} />
+            </Switch>
             </>    
         )
     }

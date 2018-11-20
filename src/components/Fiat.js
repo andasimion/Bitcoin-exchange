@@ -1,5 +1,6 @@
 import React from 'react';
 import { Select } from 'antd';
+import PropTypes from 'prop-types';
 
 const Option = Select.Option;
 
@@ -17,5 +18,11 @@ const Fiat = (props) => {
         </React.Fragment>
     );
 }
+
+Fiat.propTypes = {
+    fiatCurrency: PropTypes.string,
+    handleChange: PropTypes.funct,
+}
+
 
 export default Fiat;

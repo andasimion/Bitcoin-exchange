@@ -1,12 +1,19 @@
 import axios from 'axios';
 
-const getLatestBTCExchangeRate = (callback) => {
+export const getLatestBTCInUSDExchangeRate = (callback) => {
     axios.get(`https://api.coindesk.com/v1/bpi/currentprice/usd.json`)
         .then(res => {
-            const USD = res.data.bpi.USD.rate_float;
-            const lastUpdated = res.data.time.updated;
-            callback({USD, lastUpdated});
+            let lastUpdated = res.data.time.updated;
+            callback(lastUpdated);
         })
     }
 
-export default getLatestBTCExchangeRate;
+export const getLatestBTCInFiatExchangeRate = (fiat, callback) => {
+    axios.get(`https://api.coindesk.com/v1/bpi/currentprice/${fiat}.json`)
+        .then(res => {
+            let fiatValue = res.data.bpi[fiat].rate_float;
+            //console.log(fiatValue); this is working
+            callback(fiatValue);
+        })
+    }
+
