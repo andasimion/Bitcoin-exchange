@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const BitcoinInUSD = (props) => {
     return (
@@ -8,5 +9,10 @@ const BitcoinInUSD = (props) => {
         </React.Fragment>
     );
 }    
+
+BitcoinInUSD.propTypes = {
+    value: PropTypes.number,
+    lastUpdated: PropTypes.string
+}
 
 export default BitcoinInUSD;

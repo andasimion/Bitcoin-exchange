@@ -21,7 +21,7 @@ const Fiat = (props) => {
 
 Fiat.propTypes = {
     fiatCurrency: PropTypes.string,
-    handleChange: PropTypes.funct,
+    handleChange: PropTypes.func,
 }
 
 

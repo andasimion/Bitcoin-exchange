@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import BitcoinInUSD from '../components/BitcoinInUSD';
 import DateSelector from '../components/DateSelector';
+import PropTypes from 'prop-types';
 
 
 class HistoricalData extends Component {
@@ -22,5 +23,11 @@ class HistoricalData extends Component {
     )
   }
 }
+
+HistoricalData.propTypes = {
+  lastUpdated: PropTypes.string,
+  exchangeRates: PropTypes.objectOf(PropTypes.number)
+}
+
 
 export default HistoricalData;

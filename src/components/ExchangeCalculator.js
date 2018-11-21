@@ -1,7 +1,7 @@
 import React from 'react';
 import { Input, Row, Col} from 'antd';
+import PropTypes from 'prop-types';
 
-const InputGroup = Input.Group;
 
 const ExchangeCalculator = (props) => {
     return (
@@ -10,7 +10,6 @@ const ExchangeCalculator = (props) => {
             <br/>
             <div>
             <Row gutter={16}>
-                <InputGroup compact>
                     <Col xs={{ span: 8, offset: 0 }} >
                         <span>BTC </span>
                         <Input style={{ width: '100%' }} defaultValue={props.bitcoinAmount} 
@@ -22,12 +21,19 @@ const ExchangeCalculator = (props) => {
                         <Input style={{ width: '100%' }} defaultValue={props.fiatAmount}
                                     onChange={props.convertFiatToBitcoin}/>
                     </Col>
-                </InputGroup>
+
             </Row> 
 
             </div>
         </React.Fragment>
     );
+}
+
+ExchangeCalculator.propTypes = {
+    //bitcoinAmount: PropTypes.number,
+    //fiatAmount: PropTypes.number,
+    convertBitcoinToFiat: PropTypes.func,
+    convertFiatToBitcoin: PropTypes.func
 }
 
 export default ExchangeCalculator;

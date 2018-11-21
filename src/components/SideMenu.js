@@ -3,7 +3,7 @@ import { Menu, Icon } from 'antd';
 import { NavLink, withRouter } from 'react-router-dom';
 
 
-const SideMenu = (props) => {
+const SideMenu = () => {
     let href=window.location.href.split('/')
     href=href[3]
     return (

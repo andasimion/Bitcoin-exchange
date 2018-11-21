@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Fiat from '../components/Fiat';
 import BitcoinInUSD from '../components/BitcoinInUSD';
 import ExchangeCalculator from '../components/ExchangeCalculator';
+import PropTypes from 'prop-types';
 
 
 class Calculator extends Component {
@@ -18,16 +19,21 @@ class Calculator extends Component {
   }
 
   setNewFiatCurrency = (value) => {
-    this.setState({currentFiat: value})
+    this.setState({
+                currentFiat: value,
+                bitcoinAmount:null,
+                fiatAmount: null
+                  })
   }
 
-  convertBitcoinToFiat = (bitcoinAmount) => {
+  convertBitcoinToFiat = (e) => {
+    let bitcoinAmount = e.target.value;
     let fiatAmount = bitcoinAmount * this.props.exchangeRates[this.state.currentFiat];
-    console.log(this.props.exchangeRates[this.state.currentFiat])
     this.setState({bitcoinAmount, fiatAmount});
   }
 
-  convertFiatToBitcoin = (fiatAmount) => {
+  convertFiatToBitcoin = (e) => {
+    let fiatAmount = e.target.value;
     let bitcoinAmount = fiatAmount / this.props.exchangeRates[this.state.currentFiat];
     this.setState({bitcoinAmount, fiatAmount});
   }
@@ -53,6 +59,11 @@ class Calculator extends Component {
       </>
     );
   }
+}
+
+Calculator.propTypes = {
+  lastUpdated: PropTypes.string,
+  exchangeRates: PropTypes.objectOf(PropTypes.number)
 }
 
 export default Calculator;

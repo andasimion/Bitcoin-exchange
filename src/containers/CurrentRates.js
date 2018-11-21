@@ -19,7 +19,7 @@ class CurrentRates extends Component {
         }
       };
 
-      getLatestBTCInUSDExchangeRate (lastUpdated => this.setState({lastUpdated}) )
+      getLatestBTCInUSDExchangeRate (lastUpdated => this.setState({lastUpdated}));
       
       for (let fiat in this.state.exchangeRates) {
         getLatestBTCInFiatExchangeRate (fiat, fiatValue => this.setState(prevState => {let exchangeRates = prevState.exchangeRates;
