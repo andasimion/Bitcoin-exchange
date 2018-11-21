@@ -12,8 +12,15 @@ export const getLatestBTCInFiatExchangeRate = (fiat, callback) => {
     axios.get(`https://api.coindesk.com/v1/bpi/currentprice/${fiat}.json`)
         .then(res => {
             let fiatValue = res.data.bpi[fiat].rate_float;
-            //console.log(fiatValue); this is working
             callback(fiatValue);
         })
     }
+
+export const getHistoricalData = (startDate, endDate, callback) => {
+    axios.get(`https://api.coindesk.com/v1/bpi/historical/close.json?start=${startDate}&end=${endDate}`)
+        .then(res => {
+            let historicalData = res.data.bpi;
+            callback(historicalData);
+        })
+}
 

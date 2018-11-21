@@ -1,14 +1,22 @@
 import React, { Component } from 'react';
 import BitcoinInUSD from '../components/BitcoinInUSD';
 import DateSelector from '../components/DateSelector';
+import { getHistoricalData  } from '../apiCalls';
 import PropTypes from 'prop-types';
 
 
 class HistoricalData extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      startDate: null,
+      endDate: null,
+      historicalData : {}
+    }
   }
-  
+
+
+
   render() {
     return (
       <> 
