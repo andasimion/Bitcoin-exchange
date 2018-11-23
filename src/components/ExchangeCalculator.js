@@ -12,13 +12,13 @@ const ExchangeCalculator = (props) => {
             <Row gutter={16}>
                     <Col xs={{ span: 8, offset: 0 }} >
                         <span>BTC </span>
-                        <Input style={{ width: '100%' }} defaultValue={props.bitcoinAmount} 
+                        <Input style={{ width: '100%' }} value={props.bitcoinAmount} 
                                     onChange={props.convertBitcoinToFiat }/>
                     </Col>
                     
                     <Col xs={{ span: 8, offset: 1 }} >
                         <span>{props.fiatCurrency} </span>
-                        <Input style={{ width: '100%' }} defaultValue={props.fiatAmount}
+                        <Input style={{ width: '100%' }} value={props.fiatAmount}
                                     onChange={props.convertFiatToBitcoin}/>
                     </Col>
 
@@ -30,8 +30,8 @@ const ExchangeCalculator = (props) => {
 }
 
 ExchangeCalculator.propTypes = {
-    //bitcoinAmount: PropTypes.number,
-    //fiatAmount: PropTypes.number,
+    bitcoinAmount: PropTypes.string,
+    fiatAmount: PropTypes.string,
     convertBitcoinToFiat: PropTypes.func,
     convertFiatToBitcoin: PropTypes.func
 }

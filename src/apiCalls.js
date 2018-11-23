@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const getLatestBTCInUSDExchangeRate = (callback) => {
+export const getLastUpdatedBTCInUSDExchangeRate = (callback) => {
     axios.get(`https://api.coindesk.com/v1/bpi/currentprice/usd.json`)
         .then(res => {
             let lastUpdated = res.data.time.updated;

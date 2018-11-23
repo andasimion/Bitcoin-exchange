@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import Fiat from '../components/Fiat';
 import BitcoinInUSD from '../components/BitcoinInUSD';
 import ExchangeCalculator from '../components/ExchangeCalculator';
+import { getLastUpdatedBTCInUSDExchangeRate, getLatestBTCInFiatExchangeRate } from '../apiCalls';
+
 import PropTypes from 'prop-types';
 
 
@@ -11,11 +13,30 @@ class Calculator extends Component {
     this.state = {
       currentFiat: "USD",
       bitcoinAmount: null,
-      fiatAmount: null
+      fiatAmount: null,
+      lastUpdated: null,
+        exchangeRates: {
+            USD: null,
+            RON: null,
+            EUR: null,
+            GBP: null
+        }
     };
+
   this.setNewFiatCurrency = this.setNewFiatCurrency.bind(this);
   this.convertBitcoinToFiat  = this.convertBitcoinToFiat.bind(this);
   this.convertFiatToBitcoin  = this.convertFiatToBitcoin.bind(this);
+
+  getLastUpdatedBTCInUSDExchangeRate((lastUpdated) => {this.setState({lastUpdated})} );
+      
+  for (let fiat in this.state.exchangeRates) {
+    getLatestBTCInFiatExchangeRate (fiat, fiatValue => this.setState(prevState => {let exchangeRates = prevState.exchangeRates;
+                                                                      exchangeRates[fiat] = fiatValue;
+                                                                      return {exchangeRates}  
+          }
+        )
+      );
+    } 
   }
 
   setNewFiatCurrency = (value) => {
@@ -28,13 +49,13 @@ class Calculator extends Component {
 
   convertBitcoinToFiat = (e) => {
     let bitcoinAmount = e.target.value;
-    let fiatAmount = bitcoinAmount * this.props.exchangeRates[this.state.currentFiat];
+    let fiatAmount = String(bitcoinAmount * this.state.exchangeRates[this.state.currentFiat]);
     this.setState({bitcoinAmount, fiatAmount});
   }
 
   convertFiatToBitcoin = (e) => {
     let fiatAmount = e.target.value;
-    let bitcoinAmount = fiatAmount / this.props.exchangeRates[this.state.currentFiat];
+    let bitcoinAmount = String(fiatAmount / this.state.exchangeRates[this.state.currentFiat]);
     this.setState({bitcoinAmount, fiatAmount});
   }
 
@@ -46,7 +67,7 @@ class Calculator extends Component {
         </div>
         <br/>
         <div>
-          <BitcoinInUSD value={this.props.exchangeRates.USD} lastUpdated={this.props.lastUpdated}/>  
+          <BitcoinInUSD value={this.state.exchangeRates.USD} lastUpdated={this.state.lastUpdated}/>  
         </div>
         <br/>
         <div>
@@ -60,6 +81,7 @@ class Calculator extends Component {
     );
   }
 }
+
 
 Calculator.propTypes = {
   lastUpdated: PropTypes.string,

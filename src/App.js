@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { Layout } from 'antd';
 import SideMenu from './components/SideMenu';
-import CurrentRates from './containers/CurrentRates';
+import Calculator from './containers/Calculator';
+import HistoricalData from './containers/HistoricalData';
+import Error404 from './containers/Error404';
 import './App.css';
-
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -22,7 +23,11 @@ class App extends Component {
                     <SideMenu />
                   </Sider> 
                   <Content style={{ background: '#fff', padding: 24, margin: 0, minHeight: 280 }}>
-                    <CurrentRates />
+                    <Switch>
+                      <Route path="/" component={Calculator} exact />
+                      <Route path="/historicalData" component={HistoricalData} />
+                      <Route component={Error404} />
+                    </Switch>
                   </Content>
                 </>
               </BrowserRouter>
