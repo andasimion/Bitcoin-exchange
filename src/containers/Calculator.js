@@ -39,6 +39,7 @@ class Calculator extends Component {
     } 
   }
 
+
   setNewFiatCurrency = (value) => {
     this.setState({
                 currentFiat: value,
@@ -49,13 +50,23 @@ class Calculator extends Component {
 
   convertBitcoinToFiat = (e) => {
     let bitcoinAmount = e.target.value;
-    let fiatAmount = String(bitcoinAmount * this.state.exchangeRates[this.state.currentFiat]);
+    let fiatAmount = null;
+    if(isNaN(bitcoinAmount) || parseFloat(bitcoinAmount) < 0) {
+      fiatAmount = "Error";
+    } else {
+      fiatAmount = String(bitcoinAmount * this.state.exchangeRates[this.state.currentFiat]);
+    }
     this.setState({bitcoinAmount, fiatAmount});
   }
 
   convertFiatToBitcoin = (e) => {
     let fiatAmount = e.target.value;
-    let bitcoinAmount = String(fiatAmount / this.state.exchangeRates[this.state.currentFiat]);
+    let bitcoinAmount = null;
+    if (isNaN(fiatAmount) || parseFloat(fiatAmount) < 0) {
+      bitcoinAmount = "Error";
+    } else {
+      bitcoinAmount = String(fiatAmount / this.state.exchangeRates[this.state.currentFiat]);
+    }
     this.setState({bitcoinAmount, fiatAmount});
   }
 

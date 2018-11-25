@@ -17,10 +17,17 @@ class HistoricalData extends Component {
     }
   
     getLastUpdatedBTCInUSDExchangeRate((lastUpdated) => {this.setState({lastUpdated})} );
-    getLatestBTCInFiatExchangeRate("USD", USDValue => this.setState({exchangeRateUSD: USDValue}))
+    getLatestBTCInFiatExchangeRate("USD", USDValue => this.setState({exchangeRateUSD: USDValue}));
+
+    this.onCalendarChange = this.onCalendarChange.bind(this);
 
   }
 
+  onCalendarChange = (dates, dateStrings) => {
+    this.setState({startDate: dates[0],
+                    endDate: dates[1]});
+    console.log(dates);
+  }
 
   render() {
     return (
@@ -30,7 +37,8 @@ class HistoricalData extends Component {
         </div>
         <br/>
         <div>
-          <DateSelector />
+          <DateSelector startDate={this.state.startDate} endDate={this.state.endDate}
+          onCalendarChange={this.onCalendarChange}/>
         </div>
       </>
     )
