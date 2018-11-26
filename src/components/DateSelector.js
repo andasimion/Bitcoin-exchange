@@ -6,7 +6,7 @@ const { RangePicker } = DatePicker;
 const dateFormat = 'YYYY-MM-DD';
 
 const disabledDate = (current) => {
-    return current && current < moment("2010-07-16", "YYYY/MM/DD").endOf();
+    return current && current < moment("2010-07-16", "YYYY-MM-DD").endOf();
 }
 
 
@@ -15,7 +15,7 @@ const DateSelector = (props) => {
         <React.Fragment>
             <RangePicker 
                 value={[props.startDate, props.endDate]}
-                onCalendarChange={props.onCalendarChange}
+                onChange={props.onChange}
                 format={dateFormat}
 
                 disabledDate={disabledDate}

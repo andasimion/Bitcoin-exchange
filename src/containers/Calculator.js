@@ -15,12 +15,12 @@ class Calculator extends Component {
       bitcoinAmount: null,
       fiatAmount: null,
       lastUpdated: null,
-        exchangeRates: {
-            USD: null,
-            RON: null,
-            EUR: null,
-            GBP: null
-        }
+      exchangeRates: {
+        USD: null,
+        RON: null,
+        EUR: null,
+        GBP: null
+      }
     };
 
   this.setNewFiatCurrency = this.setNewFiatCurrency.bind(this);

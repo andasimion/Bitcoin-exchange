@@ -20,7 +20,9 @@ export const getHistoricalData = (startDate, endDate, callback) => {
     axios.get(`https://api.coindesk.com/v1/bpi/historical/close.json?start=${startDate}&end=${endDate}`)
         .then(res => {
             let historicalData = res.data.bpi;
+            console.log(Object.keys(historicalData));
+            console.log(Object.values(historicalData))
             callback(historicalData);
         })
-}
+    }
 
