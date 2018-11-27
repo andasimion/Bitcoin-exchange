@@ -3,7 +3,6 @@ import BitcoinInUSD from '../components/BitcoinInUSD';
 import DateSelector from '../components/DateSelector';
 import BitcoinChart from '../components/BitcoinChart';
 import { getLastUpdatedBTCInUSDExchangeRate, getLatestBTCInFiatExchangeRate, getHistoricalData  } from '../apiCalls';
-import PropTypes from 'prop-types';
 
 
 class HistoricalData extends Component {
@@ -14,9 +13,7 @@ class HistoricalData extends Component {
       lastUpdated: null,
       exchangeRateUSD: null,
       startDateMoment: null,
-      startDateString: null,
       endDateMoment: null,
-      endDateString:null,
       chartData: {} 
     }
     
@@ -30,11 +27,22 @@ class HistoricalData extends Component {
   onChange = (dates, dateStrings) => {
     console.log('onChange')
     this.setState({startDateMoment: dates[0],
-                   endDateMoment: dates[1],
-                   startDateString: dateStrings[0],
-                   endDateString: dateStrings[1]
+                   endDateMoment: dates[1]
                   });
+    getHistoricalData(dateStrings[0], dateStrings[1], historicalData =>  this.setState({
+      chartData: {
+       labels: Object.keys(historicalData),
+       datasets:[
+           {
+            label:`Rates during ${dateStrings[0]} and ${dateStrings[1]}`,
+            data: Object.values(historicalData),
+            borderColor: "#4A761D"
+            }
+          ]
+      } 
+    }))
   }
+
 
   render() {
     console.log("Render")
@@ -59,35 +67,7 @@ class HistoricalData extends Component {
       </>
     )
   }
-
-  componentDidUpdate(prevProps, prevState) {
-    console.log("before making the API call");
-    console.log("prevState", prevState);
-    if (this.state.startDateString !== prevState.startDateString || this.state.endDateString !== prevState.endDateString ){
-      console.log("after making the API call");
-      getHistoricalData(this.state.startDateString, this.state.endDateString, historicalData =>  this.setState({
-        chartData: {
-          labels: Object.keys(historicalData),
-          datasets:[
-            {
-              label:`Rates during ${this.state.startDateString} and ${this.state.endDateString}`,
-              data: Object.values(historicalData),
-              backgroundColor: 'green'
-            }
-          ]
-        } 
-      }))
-      console.log("State", this.state)
-    }
-
-  }
-
 }
-
-HistoricalData.propTypes = {
-  lastUpdated: PropTypes.string,
-}
-
 
 export default HistoricalData;
 

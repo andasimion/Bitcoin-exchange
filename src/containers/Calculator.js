@@ -4,8 +4,6 @@ import BitcoinInUSD from '../components/BitcoinInUSD';
 import ExchangeCalculator from '../components/ExchangeCalculator';
 import { getLastUpdatedBTCInUSDExchangeRate, getLatestBTCInFiatExchangeRate } from '../apiCalls';
 
-import PropTypes from 'prop-types';
-
 
 class Calculator extends Component {
   constructor(props) {
@@ -43,8 +41,7 @@ class Calculator extends Component {
   setNewFiatCurrency = (value) => {
     this.setState({
                 currentFiat: value,
-                bitcoinAmount:null,
-                fiatAmount: null
+                fiatAmount: this.state.bitcoinAmount ? String(this.state.bitcoinAmount * this.state.exchangeRates[value]) : null
                   })
   }
 
@@ -94,9 +91,5 @@ class Calculator extends Component {
 }
 
 
-Calculator.propTypes = {
-  lastUpdated: PropTypes.string,
-  exchangeRates: PropTypes.objectOf(PropTypes.number)
-}
-
 export default Calculator;
+

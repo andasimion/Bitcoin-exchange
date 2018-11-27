@@ -1,12 +1,14 @@
 import React from 'react';
 import { DatePicker} from 'antd';
 import moment from 'moment';
+import PropTypes from 'prop-types';
+
 
 const { RangePicker } = DatePicker;
 const dateFormat = 'YYYY-MM-DD';
 
 const disabledDate = (current) => {
-    return current && current < moment("2010-07-16", "YYYY-MM-DD").endOf();
+    return current && current < moment("2010-07-16", dateFormat).endOf() ;
 }
 
 
@@ -35,6 +37,11 @@ const DateSelector = (props) => {
             />
         </React.Fragment>
     );
+}
+
+DateSelector.propTypes = { 
+    value: PropTypes.arrayOf(PropTypes.object),
+    onChange: PropTypes.func
 }
 
 export default DateSelector;
