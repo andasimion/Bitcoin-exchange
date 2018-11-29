@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Row, Col} from 'antd';
+import { Form, Input, Row, Col} from 'antd';
 import PropTypes from 'prop-types';
 
 
@@ -9,21 +9,30 @@ const ExchangeCalculator = (props) => {
             <div>Exchange Calculator: </div>
             <br/>
             <div>
-            <Row gutter={16}>
+            <Form>
+                <Row gutter={16}>
                     <Col xs={{ span: 8, offset: 0 }} >
-                        <span>BTC </span>
-                        <Input style={{ width: '100%' }} value={props.bitcoinAmount} 
+                        <Form.Item
+                          label="BTC"
+                          help="Provide only number greater than 0"
+                        >
+                          <Input style={{ width: '100%' }} value={props.bitcoinAmount} 
                                     onChange={props.convertBitcoinToFiat }/>
+                        </Form.Item>            
                     </Col>
                     
                     <Col xs={{ span: 8, offset: 1 }} >
-                        <span>{props.fiatCurrency} </span>
-                        <Input style={{ width: '100%' }} value={props.fiatAmount}
+                        <Form.Item
+                          label={props.fiatCurrency}
+                          help="Provide only number greater than 0"
+                        >
+                          <Input style={{ width: '100%' }} value={props.fiatAmount}
                                     onChange={props.convertFiatToBitcoin}/>
+                        </Form.Item> 
                     </Col>
 
-            </Row> 
-
+                </Row> 
+            </Form>
             </div>
         </React.Fragment>
     );
