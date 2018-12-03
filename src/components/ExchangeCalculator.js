@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Input, Row, Col} from 'antd';
+import { Form, Input, Row, Col } from 'antd';
 import PropTypes from 'prop-types';
 
 
@@ -14,17 +14,22 @@ const ExchangeCalculator = (props) => {
                     <Col xs={{ span: 8, offset: 0 }} >
                         <Form.Item
                           label="BTC"
-                          help="Provide only number greater than 0"
+                          colon={false}
                         >
-                          <Input style={{ width: '100%' }} value={props.bitcoinAmount} 
-                                    onChange={props.convertBitcoinToFiat }/>
+                          <Input style={{ width: '100%' }} 
+                                 type ={"number"} 
+                                 value={props.bitcoinAmount} 
+                                 onChange={props.convertBitcoinToFiat }
+                                 validate={props.validate}
+                                 message="Provide number greater than 0"/>
                         </Form.Item>            
                     </Col>
                     
                     <Col xs={{ span: 8, offset: 1 }} >
                         <Form.Item
                           label={props.fiatCurrency}
-                          help="Provide only number greater than 0"
+                          colon={false}
+                          help="Provide number greater than 0"
                         >
                           <Input style={{ width: '100%' }} value={props.fiatAmount}
                                     onChange={props.convertFiatToBitcoin}/>

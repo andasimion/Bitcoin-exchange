@@ -5,7 +5,7 @@ import SideMenu from './components/SideMenu';
 import Calculator from './containers/Calculator';
 import HistoricalData from './containers/HistoricalData';
 import Error404 from './containers/Error404';
-import { Offline, Online } from "react-detect-offline";
+import { Offline, Online } from 'react-detect-offline';
 import './App.css';
 
 const { Header, Content, Footer, Sider } = Layout;
