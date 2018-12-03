@@ -34,7 +34,9 @@ class Calculator extends Component {
   this.setNewFiatCurrency = this.setNewFiatCurrency.bind(this);
   this.convertBitcoinToFiat  = this.convertBitcoinToFiat.bind(this);
   this.convertFiatToBitcoin  = this.convertFiatToBitcoin.bind(this);
-  this.makeApiCalls = this.makeApiCalls.bind(this);
+  this.fetchRateForFiat = this.fetchRateForFiat.bind(this);
+  this.fetchOtherFiatRates = this.fetchOtherFiatRates.bind(this);
+  this.fetchLastUpdatedUSDRate = this.fetchLastUpdatedUSDRate.bind(this);
   this.updateExchangeRateOnSuccess = this.updateExchangeRateOnSuccess.bind(this);
   this.updateExchangeRateOnError = this.updateExchangeRateOnError.bind(this);
   this.refresh = this.refresh.bind(this);
@@ -43,12 +45,30 @@ class Calculator extends Component {
 
   componentDidMount() {
     console.log("componentDidMount");
-    this.makeApiCalls();
+    this.fetchRateForFiat("USD")
+      .finally(() => Promise.all([
+        this.fetchOtherFiatRates("USD"),
+        this.fetchLastUpdatedUSDRate()
+      ]))
   }
 
 
-  makeApiCalls = () => {
-    getLastUpdatedBTCInUSDExchangeRate()
+  fetchRateForFiat = (fiat) => getLatestBTCInFiatExchangeRate (fiat)
+    .then(response => {
+      this.updateExchangeRateOnSuccess(response, fiat);
+    })
+    .catch(error => {
+      this.updateExchangeRateOnError(error, fiat);
+    })
+
+  fetchOtherFiatRates = (exceptFiat) => {
+    let otherFiats = Object.keys(this.state.exchangeRates).filter((fiat) => fiat !== exceptFiat);
+    let promises = otherFiats.map((fiat) => this.fetchRateForFiat(fiat))
+    return Promise.all(promises);
+  }
+
+  fetchLastUpdatedUSDRate = () => {
+    return getLastUpdatedBTCInUSDExchangeRate()
     .then(response => {
       this.setState({lastUpdated: response.data.time.updated,
                      lastUpdatedError: null});
@@ -57,34 +77,18 @@ class Calculator extends Component {
       this.setState({lastUpdatedError: error.message,
                      lastUpdated: null});
     });
-  
-    getLatestBTCInFiatExchangeRate ("USD")
-      .then(response => {
-        this.updateExchangeRateOnSuccess(response, "USD");
-      })
-      .catch(error => {
-        this.updateExchangeRateOnError(error, "USD");
-      })
-       
-    for (let fiat of Object.keys(this.state.exchangeRates).slice(1)) {
-      getLatestBTCInFiatExchangeRate (fiat)
-        .then(response => {
-          this.updateExchangeRateOnSuccess(response, fiat);
-        })
-        .catch(error => {
-          this.updateExchangeRateOnError(error, fiat);
-        })
-      } 
   }
-
+    
   updateExchangeRateOnSuccess = (response, fiat) => {
     this.setState(
       prevState => {
         let exchangeRates = prevState.exchangeRates;
         let exchangeRatesError = prevState.exchangeRatesError;
+        
         exchangeRates[fiat] = response.data.bpi[fiat].rate_float;
+        console.log("exchange rate for "+ fiat +" is now " + exchangeRates[fiat])
         exchangeRatesError[fiat] = null;
-       // return {exchangeRates} , {exchangeRatesError} 
+        return {exchangeRates, exchangeRatesError} 
       }
     )
   }
@@ -96,22 +100,37 @@ class Calculator extends Component {
         let exchangeRatesError = prevState.exchangeRatesError;
         exchangeRates[fiat] = null;
         exchangeRatesError[fiat] = error.message;
-      //  return {exchangeRates} , {exchangeRatesError} 
+        return {exchangeRates, exchangeRatesError} 
       }
     )
   }
   
   refresh = (e) => {
     console.log("refresh")
-    this.makeApiCalls();
-    this.setState({fiatAmount: String(this.state.bitcoinAmount * this.state.exchangeRates[this.state.currentFiat]) })
+    let currentFiat = this.state.currentFiat;
+    this.fetchRateForFiat(currentFiat)
+      .then(() => this.setState(prevState => {
+          let newFiatAmount = this.bitcoinPriceInFiat(
+              prevState.bitcoinAmount, 
+              prevState.exchangeRates[prevState.currentFiat]);
+          console.log("fiatAmount is now "+newFiatAmount );
+          return {fiatAmount: String(newFiatAmount)};
+        }))
+      .finally(() => Promise.all([
+        this.fetchOtherFiatRates(currentFiat),
+        this.fetchLastUpdatedUSDRate()
+      ]))
   }
 
   setNewFiatCurrency = (value) => {
-    this.setState({
-                currentFiat: value,
-                fiatAmount: this.state.bitcoinAmount ? String(this.state.bitcoinAmount * this.state.exchangeRates[value]) : null
-                  })
+    this.setState((prevState) => {
+      let newFiatAmount = this.bitcoinPriceInFiat(prevState.bitcoinAmount, prevState.exchangeRates[value]);
+      return {currentFiat: value, fiatAmount: String(newFiatAmount)};
+    });
+  }
+
+  bitcoinPriceInFiat = (bitcoinAmount, exchangeRate) => {
+     return bitcoinAmount ? bitcoinAmount * exchangeRate : null;
   }
 
   convertBitcoinToFiat = (e) => {
@@ -120,7 +139,7 @@ class Calculator extends Component {
     if(isNaN(bitcoinAmount) || parseFloat(bitcoinAmount) < 0) {
       fiatAmount = "Error";
     } else {
-      fiatAmount = String(bitcoinAmount * this.state.exchangeRates[this.state.currentFiat]);
+      fiatAmount = String(this.bitcoinPriceInFiat(bitcoinAmount, this.state.exchangeRates[this.state.currentFiat]));
     }
     this.setState({bitcoinAmount, fiatAmount});
   }
