@@ -4,8 +4,9 @@ import BitcoinInUSD from '../components/BitcoinInUSD';
 import DateSelector from '../components/DateSelector';
 import BitcoinChart from '../components/BitcoinChart';
 import ReloadButton from '../components/ReloadButton';
-import { getLastUpdatedBTCInUSDExchangeRate, getLatestBTCInFiatExchangeRate, getHistoricalData  } from '../apiCalls';
+import { getLastUpdatedBTCInUSDExchangeRate, getLatestBTCInFiatExchangeRate, getHistoricalData } from '../apiCalls';
 import moment from 'moment';
+
 
 class HistoricalData extends Component {
   constructor(props) {
@@ -16,98 +17,106 @@ class HistoricalData extends Component {
       exchangeRateUSD: null,
       exchangeRateUSDError: null,
       startDate: moment().subtract(7, "days"),
-      endDate: moment(),
+      endDate: moment().subtract(1, "day"),
       chartData: {}, 
       chartDataError: null
     }
     
-    this.makeApiCalls = this.makeApiCalls.bind(this);
     this.onChange = this.onChange.bind(this);
     this.refresh = this.refresh.bind(this);
+    this.fetchRateForFiat = this.fetchRateForFiat.bind(this);
+    this.fetchLastUpdatedUSDRate = this.fetchLastUpdatedUSDRate.bind(this);
+    this.updateExchangeRateOnSuccess = this.updateExchangeRateOnSuccess.bind(this);
+    this.updateExchangeRateOnError = this.updateExchangeRateOnError.bind(this);
+    this.fetchHistoricalData = this.fetchHistoricalData.bind(this);
   }
   
   componentDidMount() {
-    this.makeApiCalls()
+    this.fetchRateForFiat("USD");
+    this.fetchLastUpdatedUSDRate();
+    this.fetchHistoricalData(this.state.startDate.format('YYYY-MM-DD'), 
+                             this.state.endDate.format('YYYY-MM-DD'));
+  }
+  
+  fetchRateForFiat = (fiat) => getLatestBTCInFiatExchangeRate(fiat)
+    .then(response => {
+      this.updateExchangeRateOnSuccess(response, fiat);
+    })
+    .catch(error => {
+      this.updateExchangeRateOnError(error, fiat);
+    })
+
+  updateExchangeRateOnSuccess = (response, fiat) => {
+    this.setState(
+      prevState => {
+        let exchangeRateUSD = prevState.exchangeRateUSD;
+        let exchangeRateUSDError = prevState.exchangeRateUSDError;
+        
+        exchangeRateUSD = response.data.bpi[fiat].rate_float;
+        exchangeRateUSDError = null;
+        return {exchangeRateUSD, exchangeRateUSDError} 
+      }
+    )
+  }
+  
+  updateExchangeRateOnError = (error, fiat) => {
+    this.setState(
+      prevState => {
+        let exchangeRateUSD = prevState.exchangeRateUSD;
+        let exchangeRateUSDError = prevState.exchangeRateUSDError;
+        exchangeRateUSD = null;
+        exchangeRateUSDError = error.message;
+        return {exchangeRateUSD, exchangeRateUSDError} 
+      }
+    )
   }
 
-  makeApiCalls = () => {
-    getLastUpdatedBTCInUSDExchangeRate()
-      .then(response => {
-        this.setState({lastUpdated: response.data.time.updated,
-                    lastUpdatedError: null});
-      })
-      .catch(error => {
-        this.setState({lastUpdatedError: error.message,
-                    lastUpdated: null});
+  fetchLastUpdatedUSDRate = () => {
+    return getLastUpdatedBTCInUSDExchangeRate()
+    .then(response => {
+      this.setState({lastUpdated: response.data.time.updated,
+                      lastUpdatedError: null});
+    })
+    .catch(error => {
+      this.setState({lastUpdatedError: error.message,
+                      lastUpdated: null});
+    });
+  }
+
+  fetchHistoricalData = (startDate, endDate) => getHistoricalData(startDate, endDate)
+    .then(response => {
+      this.setState({
+        chartData: {
+          labels: Object.keys(response.data.bpi),
+          datasets:[
+            {
+              label:`Rates during ${this.state.startDate.format('YYYY-MM-DD')} and ${this.state.endDate.format('YYYY-MM-DD')}`,
+              data: Object.values(response.data.bpi),
+              borderColor: "#4A761D"
+            }
+          ]
+        }, 
+        chartDataError: null});
+    })
+    .catch(error => {
+      this.setState({
+        chartData: {},
+        chartDataError: error.message
       });
-
-
-    getLatestBTCInFiatExchangeRate ("USD")
-      .then(response => {
-        this.setState({exchangeRateUSD: response.data.bpi.USD.rate_float,
-                       exchangeRateUSDError: null})
-      })
-      .catch(error => {
-        this.setState({exchangeRateUSD: null,
-                        exchangeRateUSDError: error.message})
-      })
+    })  
   
-    getHistoricalData(this.state.startDate.format('YYYY-MM-DD'), 
-                      this.state.endDate.format('YYYY-MM-DD')) 
-      .then(response => {
-        this.setState({
-          chartData: {
-            labels: Object.keys(response.data.bpi),
-            datasets:[
-              {
-                label:`Rates during ${this.state.startDate.format('YYYY-MM-DD')} and ${this.state.endDate.format('YYYY-MM-DD')}`,
-                data: Object.values(response.data.bpi),
-                borderColor: "#4A761D"
-              }
-            ]
-          }, 
-          chartDataError: null});
-      })
-      .catch(error => {
-        this.setState({
-          chartData: {},
-          chartDataError: error.message
-        });
-      })  
-  
-  }
-
   onChange = (dates, dateStrings) => {
     this.setState({startDate: dates[0],
                    endDate: dates[1]
                   });
-    getHistoricalData(dateStrings[0], dateStrings[1])
-      .then(response => {
-        this.setState({
-          chartData: {
-            labels: Object.keys(response.data.bpi),
-            datasets:[
-              {
-                label:`Rates during ${dateStrings[0]} and ${dateStrings[1]}`,
-                data: Object.values(response.data.bpi),
-                borderColor: "#4A761D"
-              }
-            ]
-          }, 
-          chartDataError: null});
-      })
-      .catch(error => {
-        this.setState({
-          chartData: {},
-          chartDataError: error.message
-        });
-      })  
+    this.fetchHistoricalData(dateStrings[0], dateStrings[1])
 
   }
 
   refresh = (e) => {
     console.log("refresh")
-    this.makeApiCalls();
+    this.fetchHistoricalData(moment().subtract(7, "days").format('YYYY-MM-DD'),
+                             moment().subtract(1, "days").format('YYYY-MM-DD'));
   }
 
   render() {

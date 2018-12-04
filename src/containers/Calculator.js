@@ -9,7 +9,6 @@ import { getLastUpdatedBTCInUSDExchangeRate, getLatestBTCInFiatExchangeRate } fr
 
 class Calculator extends Component {
   constructor(props) {
-    console.log("constructor")
     super(props);
     this.state = {
       currentFiat: "USD",
@@ -40,11 +39,9 @@ class Calculator extends Component {
   this.updateExchangeRateOnSuccess = this.updateExchangeRateOnSuccess.bind(this);
   this.updateExchangeRateOnError = this.updateExchangeRateOnError.bind(this);
   this.refresh = this.refresh.bind(this);
-
   }
 
   componentDidMount() {
-    console.log("componentDidMount");
     this.fetchRateForFiat("USD")
       .finally(() => Promise.all([
         this.fetchOtherFiatRates("USD"),
@@ -52,8 +49,7 @@ class Calculator extends Component {
       ]))
   }
 
-
-  fetchRateForFiat = (fiat) => getLatestBTCInFiatExchangeRate (fiat)
+  fetchRateForFiat = (fiat) => getLatestBTCInFiatExchangeRate(fiat)
     .then(response => {
       this.updateExchangeRateOnSuccess(response, fiat);
     })
@@ -86,7 +82,6 @@ class Calculator extends Component {
         let exchangeRatesError = prevState.exchangeRatesError;
         
         exchangeRates[fiat] = response.data.bpi[fiat].rate_float;
-        console.log("exchange rate for "+ fiat +" is now " + exchangeRates[fiat])
         exchangeRatesError[fiat] = null;
         return {exchangeRates, exchangeRatesError} 
       }
@@ -105,16 +100,14 @@ class Calculator extends Component {
     )
   }
   
-  refresh = (e) => {
-    console.log("refresh")
+  refresh = () => {
     let currentFiat = this.state.currentFiat;
     this.fetchRateForFiat(currentFiat)
       .then(() => this.setState(prevState => {
           let newFiatAmount = this.bitcoinPriceInFiat(
               prevState.bitcoinAmount, 
               prevState.exchangeRates[prevState.currentFiat]);
-          console.log("fiatAmount is now "+newFiatAmount );
-          return {fiatAmount: String(newFiatAmount)};
+          return {fiatAmount: newFiatAmount};
         }))
       .finally(() => Promise.all([
         this.fetchOtherFiatRates(currentFiat),
@@ -125,12 +118,12 @@ class Calculator extends Component {
   setNewFiatCurrency = (value) => {
     this.setState((prevState) => {
       let newFiatAmount = this.bitcoinPriceInFiat(prevState.bitcoinAmount, prevState.exchangeRates[value]);
-      return {currentFiat: value, fiatAmount: String(newFiatAmount)};
+      return {currentFiat: value, fiatAmount: newFiatAmount};
     });
   }
 
   bitcoinPriceInFiat = (bitcoinAmount, exchangeRate) => {
-     return bitcoinAmount ? bitcoinAmount * exchangeRate : null;
+     return bitcoinAmount ? String(bitcoinAmount * exchangeRate) : null;
   }
 
   convertBitcoinToFiat = (e) => {
@@ -139,7 +132,7 @@ class Calculator extends Component {
     if(isNaN(bitcoinAmount) || parseFloat(bitcoinAmount) < 0) {
       fiatAmount = "Error";
     } else {
-      fiatAmount = String(this.bitcoinPriceInFiat(bitcoinAmount, this.state.exchangeRates[this.state.currentFiat]));
+      fiatAmount = this.bitcoinPriceInFiat(bitcoinAmount, this.state.exchangeRates[this.state.currentFiat]);
     }
     this.setState({bitcoinAmount, fiatAmount});
   }
@@ -160,7 +153,6 @@ class Calculator extends Component {
   }*/
 
   render() {
-    console.log("render")
     return (
       <>
         <Row>
@@ -195,7 +187,6 @@ class Calculator extends Component {
     );
   }
 }
-
 
 export default Calculator;
 
