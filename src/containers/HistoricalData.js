@@ -141,8 +141,10 @@ class HistoricalData extends Component {
                         onChange={this.onChange}
           />
         </div>
+        <br/>
         <div>
             <BitcoinChart data={this.state.chartData}
+                          chartDataError={this.state.chartDataError}
             />
         </div>
       </>

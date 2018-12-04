@@ -5,7 +5,6 @@ import SideMenu from './components/SideMenu';
 import Calculator from './containers/Calculator';
 import HistoricalData from './containers/HistoricalData';
 import Error404 from './containers/Error404';
-import { Offline, Online } from 'react-detect-offline';
 import './App.css';
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -23,8 +22,6 @@ class App extends Component {
                   <Sider width={200} style={{ background: '#000' }}>
                     <SideMenu />
                   </Sider> 
-                  <>
-                  <Online>
                     <Content style={{ background: '#fff', padding: 24, margin: 0, minHeight: 280 }}>
                       <Switch>
                         <Route path="/" component={Calculator} exact />
@@ -32,9 +29,6 @@ class App extends Component {
                         <Route component={Error404} />
                       </Switch>
                     </Content>
-                  </Online>
-                  <Offline>You're offline right now. Check your connection.</Offline>
-                  </>
                 </>
               </BrowserRouter>
             </Layout>

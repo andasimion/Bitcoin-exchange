@@ -1,11 +1,36 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Alert } from 'antd';
 
 const BitcoinInUSD = (props) => {
     return (
         <React.Fragment>
-            <span>Current BTC price in USD: {props.value || props.valueError}</span>
-            <div style={{fontSize: "small"}}>Last updated: {props.lastUpdated || props.lastUpdatedError}</div>
+            <div>
+                <span>
+                    Current BTC price in USD: 
+                        {
+                        props.value || 
+                        <Alert 
+                            message="Error"
+                            description={props.valueError}
+                            type="error"
+                            showIcon />
+                        }
+                </span>
+            </div>
+            <div>
+                <span style={{fontSize: "small"}}>
+                    Last updated: 
+                        {
+                        props.lastUpdated || 
+                        <Alert 
+                            message="Error"
+                            description={props.lastUpdatedError}
+                            type="error"
+                            showIcon />
+                        }
+                </span>
+            </div>
         </React.Fragment>
     );
 }    
