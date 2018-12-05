@@ -14,8 +14,9 @@ class HistoricalData extends Component {
     this.state = {
       lastUpdated: null,
       lastUpdatedError: null,
-      exchangeRateUSD: null,
-      exchangeRateUSDError: null,
+      lastUpdatedSpin: null,
+      exchangeRateUSD: null, 
+      exchangeRateUSDState: {state: "InProgress"},
       startDate: moment().subtract(7, "days"),
       endDate: moment().subtract(1, "day"),
       chartData: {}, 
@@ -50,11 +51,10 @@ class HistoricalData extends Component {
     this.setState(
       prevState => {
         let exchangeRateUSD = prevState.exchangeRateUSD;
-        let exchangeRateUSDError = prevState.exchangeRateUSDError;
-        
+        let exchangeRateUSDState = prevState.exchangeRateUSDState;
         exchangeRateUSD = response.data.bpi[fiat].rate_float;
-        exchangeRateUSDError = null;
-        return {exchangeRateUSD, exchangeRateUSDError} 
+        exchangeRateUSDState = {state: "success"};
+        return {exchangeRateUSD, exchangeRateUSDState} 
       }
     )
   }
@@ -63,10 +63,11 @@ class HistoricalData extends Component {
     this.setState(
       prevState => {
         let exchangeRateUSD = prevState.exchangeRateUSD;
-        let exchangeRateUSDError = prevState.exchangeRateUSDError;
+        let exchangeRateUSDState = prevState.exchangeRateUSDState;
         exchangeRateUSD = null;
-        exchangeRateUSDError = error.message;
-        return {exchangeRateUSD, exchangeRateUSDError} 
+        exchangeRateUSDState = {state: "error",
+                                message: error.message};
+        return {exchangeRateUSD, exchangeRateUSDState} 
       }
     )
   }
@@ -125,9 +126,10 @@ class HistoricalData extends Component {
         <Row>
           <Col span={8}>
             <BitcoinInUSD value={this.state.exchangeRateUSD}
-                          valueError={this.state.exchangeRateUSDError} 
+                          valueState={this.state.exchangeRateUSDState} 
                           lastUpdated={this.state.lastUpdated}
                           lastUpdatedError={this.state.lastUpdatedError}
+                          lastUpdatedSpin={this.state.lastUpdatedSpin}
             /> 
           </Col> 
           <Col span={1} offset={15}>
@@ -144,7 +146,7 @@ class HistoricalData extends Component {
         <br/>
         <div>
             <BitcoinChart data={this.state.chartData}
-                          chartDataError={this.state.chartDataError}
+                          dataError={this.state.chartDataError}
             />
         </div>
       </>

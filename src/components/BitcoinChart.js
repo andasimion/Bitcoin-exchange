@@ -3,11 +3,20 @@ import { Alert } from 'antd';
 import { Line } from 'react-chartjs-2';
 
 const BitcoinChart = (props) => {
+    const chartData = {...props.data};
+
     return (
         <>
-        {props.chartDataError !== null ? 
+        {
+        Object.getOwnPropertyNames(chartData).length === 0 ? 
+            <Alert 
+            message="Error"
+            description={props.dataError}
+            type="error"
+            showIcon /> 
+            :
             <Line
-                data={props.data}
+                data={chartData}
                 options={{
                     title:{
                         display: true,
@@ -19,12 +28,7 @@ const BitcoinChart = (props) => {
                         position: 'top',
                         }
                 }}
-            /> :
-            <Alert 
-            message="Error"
-            description={props.chartDataError}
-            type="error"
-            showIcon />
+            />  
         }
         </>     
         )

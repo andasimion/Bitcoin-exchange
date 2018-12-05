@@ -16,6 +16,8 @@ class Calculator extends Component {
       fiatAmount: null,
       lastUpdated: null,
       lastUpdatedError: null,
+      lastUpdatedSpin: true,
+      USDSpin: true,
       bitcoinInputColor: "default",
       fiatInputColor: "default",
       exchangeRates: {
@@ -24,11 +26,11 @@ class Calculator extends Component {
         EUR: null,
         GBP: null,
       },
-      exchangeRatesError: {
-        USD: null,
-        RON: null,
-        EUR: null,
-        GBP: null,
+      exchangeRatesState: {
+        USD: {state: "inProgress"},
+        RON: {state: "inProgress"},
+        EUR: {state: "inProgress"},
+        GBP: {state: "inProgress"},
       }
     };
   
@@ -69,11 +71,13 @@ class Calculator extends Component {
     return getLastUpdatedBTCInUSDExchangeRate()
     .then(response => {
       this.setState({lastUpdated: response.data.time.updated,
-                     lastUpdatedError: null});
+                     lastUpdatedError: null,
+                     lastUpdatedSpin: false});
     })
     .catch(error => {
       this.setState({lastUpdatedError: error.message,
-                     lastUpdated: null});
+                     lastUpdated: null,
+                     lastUpdatedSpin: false});
     });
   }
     
@@ -81,11 +85,11 @@ class Calculator extends Component {
     this.setState(
       prevState => {
         let exchangeRates = prevState.exchangeRates;
-        let exchangeRatesError = prevState.exchangeRatesError;
+        let exchangeRatesState = prevState.exchangeRatesState;
         
         exchangeRates[fiat] = response.data.bpi[fiat].rate_float;
-        exchangeRatesError[fiat] = null;
-        return {exchangeRates, exchangeRatesError} 
+        exchangeRatesState[fiat] = {state: "success"};
+        return {exchangeRates, exchangeRatesState} 
       }
     )
   }
@@ -94,10 +98,11 @@ class Calculator extends Component {
     this.setState(
       prevState => {
         let exchangeRates = prevState.exchangeRates;
-        let exchangeRatesError = prevState.exchangeRatesError;
+        let exchangeRatesState = prevState.exchangeRatesState;
         exchangeRates[fiat] = null;
-        exchangeRatesError[fiat] = error.message;
-        return {exchangeRates, exchangeRatesError} 
+        exchangeRatesState[fiat] = {state: "error",
+                                    message: "error.message" } ;
+        return {exchangeRates, exchangeRatesState} 
       }
     )
   }
@@ -183,9 +188,10 @@ class Calculator extends Component {
         <br/>
         <div>
           <BitcoinInUSD value={this.state.exchangeRates.USD} 
-                        valueError={this.state.exchangeRatesError.USD}
+                        valueState={this.state.exchangeRatesState.USD}
                         lastUpdated={this.state.lastUpdated}
                         lastUpdatedError={this.state.lastUpdatedError}
+                        lastUpdatedSpin={this.state.lastUpdatedSpin}
           />  
         </div>
         <br/>
