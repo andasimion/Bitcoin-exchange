@@ -15,9 +15,9 @@ class Calculator extends Component {
       bitcoinAmount: null,
       fiatAmount: null,
       lastUpdated: null,
-      lastUpdatedError: null,
-      lastUpdatedSpin: true,
-      USDSpin: true,
+      lastUpdatedStatus: {status: "inProgress",
+                          errorMessage: null
+                         },
       bitcoinInputColor: "default",
       fiatInputColor: "default",
       exchangeRates: {
@@ -26,11 +26,19 @@ class Calculator extends Component {
         EUR: null,
         GBP: null,
       },
-      exchangeRatesState: {
-        USD: {state: "inProgress"},
-        RON: {state: "inProgress"},
-        EUR: {state: "inProgress"},
-        GBP: {state: "inProgress"},
+      exchangeRatesStatus: {
+        USD: {status: "inProgress",
+              errorMessage: null
+             },
+        RON: {status: "inProgress",
+              errorMessage: null
+             },
+        EUR: {status: "inProgress",
+              errorMessage: null
+             },
+        GBP: {status: "inProgress",
+              errorMessage: null
+             },
       }
     };
   
@@ -70,14 +78,29 @@ class Calculator extends Component {
   fetchLastUpdatedUSDRate = () => {
     return getLastUpdatedBTCInUSDExchangeRate()
     .then(response => {
-      this.setState({lastUpdated: response.data.time.updated,
-                     lastUpdatedError: null,
-                     lastUpdatedSpin: false});
-    })
+      this.setState(
+        prevState => {
+          let lastUpdated = prevState.lastUpdated;
+          let lastUpdatedStatus = prevState.lastUpdatedStatus;
+
+          lastUpdated = response.data.time.updated;
+          lastUpdatedStatus = {status: "success",
+                               errorMessage: null};
+          return {lastUpdated, lastUpdatedStatus};
+        }
+    )})
     .catch(error => {
-      this.setState({lastUpdatedError: error.message,
-                     lastUpdated: null,
-                     lastUpdatedSpin: false});
+      this.setState(
+        prevState => {
+          let lastUpdated = prevState.lastUpdated;
+          let lastUpdatedStatus = prevState.lastUpdatedStatus;
+
+          lastUpdated = null;
+          lastUpdatedStatus = {status: "error",
+                               errorMessage: error.message};
+          return {lastUpdated, lastUpdatedStatus};
+        }
+      );
     });
   }
     
@@ -85,11 +108,12 @@ class Calculator extends Component {
     this.setState(
       prevState => {
         let exchangeRates = prevState.exchangeRates;
-        let exchangeRatesState = prevState.exchangeRatesState;
+        let exchangeRatesStatus = prevState.exchangeRatesStatus;
         
         exchangeRates[fiat] = response.data.bpi[fiat].rate_float;
-        exchangeRatesState[fiat] = {state: "success"};
-        return {exchangeRates, exchangeRatesState} 
+        exchangeRatesStatus[fiat] = {status: "success",
+                                     errorMessage: null};
+        return {exchangeRates, exchangeRatesStatus} 
       }
     )
   }
@@ -98,17 +122,24 @@ class Calculator extends Component {
     this.setState(
       prevState => {
         let exchangeRates = prevState.exchangeRates;
-        let exchangeRatesState = prevState.exchangeRatesState;
+        let exchangeRatesStatus = prevState.exchangeRatesStatus;
         exchangeRates[fiat] = null;
-        exchangeRatesState[fiat] = {state: "error",
-                                    message: "error.message" } ;
-        return {exchangeRates, exchangeRatesState} 
+        exchangeRatesStatus[fiat] = {status: "error",
+                                     errorMessage: error.message};
+        return {exchangeRates, exchangeRatesStatus} 
       }
     )
   }
   
   refresh = () => {
     let currentFiat = this.state.currentFiat;
+    this.setState(prevState => {
+      let lastUpdatedStatus = prevState.lastUpdatedStatus;
+      let exchangeRatesStatus = prevState.exchangeRatesStatus;
+      lastUpdatedStatus.status = "inProgress";
+      exchangeRatesStatus.USD.status = "inProgress";
+      return {lastUpdatedStatus, exchangeRatesStatus};
+    })
     this.fetchRateForFiat(currentFiat)
       .then(() => this.setState(prevState => {
           let newFiatAmount = this.bitcoinPriceInFiat(
@@ -187,11 +218,10 @@ class Calculator extends Component {
         </Row>
         <br/>
         <div>
-          <BitcoinInUSD value={this.state.exchangeRates.USD} 
-                        valueState={this.state.exchangeRatesState.USD}
+          <BitcoinInUSD USDValue={this.state.exchangeRates["USD"]} 
+                        USDStatus={this.state.exchangeRatesStatus["USD"]}
                         lastUpdated={this.state.lastUpdated}
-                        lastUpdatedError={this.state.lastUpdatedError}
-                        lastUpdatedSpin={this.state.lastUpdatedSpin}
+                        lastUpdatedStatus={this.state.lastUpdatedStatus}
           />  
         </div>
         <br/>

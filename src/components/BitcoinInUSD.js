@@ -11,13 +11,13 @@ const BitcoinInUSD = (props) => {
                     <span>Current BTC price in USD: </span> 
                         <span>   
                             {
-                            props.valueState.state === "inProgress" ? <Spinner /> :
-                                props.valueState.state === "error" ? 
+                            props.USDStatus.status === "inProgress" ? <Spinner size="small"/> :
+                                props.USDStatus.status === "error" ? 
                                     <Alert 
                                         message="Error"
-                                        description={props.valueState.message}
+                                        description={props.USDStatus.errorMessage}
                                         type="error"
-                                        showIcon /> : props.value
+                                        showIcon /> : props.USDValue
                             }
                         </span> 
                 </span>
@@ -27,11 +27,11 @@ const BitcoinInUSD = (props) => {
                     <span>Last updated: </span>
                         <span>
                         {
-                        props.lastUpdatedSpin ? <Spinner /> :
-                                    props.lastUpdatedError ?  
+                        props.lastUpdatedStatus.status === "inProgress" ? <Spinner size="small"/> :
+                                    props.lastUpdatedStatus.status === "error" ?  
                                         <Alert 
                                         message="Error"
-                                        description={props.lastUpdatedError}
+                                        description={props.lastUpdatedStatus.errorMessage}
                                         type="error"
                                         showIcon /> : props.lastUpdated
                         }

@@ -2,9 +2,9 @@ import React from 'react';
 import { Spin } from 'antd';
 
 
-const Spinner = () => {
+const Spinner = (props) => {
     return(
-        <Spin  />
+        <Spin  size={props.size} style={props.style}/>
     )
 }
 
