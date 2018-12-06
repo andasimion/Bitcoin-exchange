@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col } from 'antd';
+import { Row, Col, Card } from 'antd';
 import BitcoinInUSD from '../components/BitcoinInUSD';
 import DateSelector from '../components/DateSelector';
 import BitcoinChart from '../components/BitcoinChart';
@@ -181,22 +181,16 @@ class HistoricalData extends Component {
           </Col>
         </Row>
         <br/>
-        <div>
-          <DateSelector startDate={this.state.startDate} 
+        <DateSelector startDate={this.state.startDate} 
                         endDate={this.state.endDate}
                         onChange={this.onChange}
-          />
-        </div>
+        />
         <br/>
-        <div>
-            <BitcoinChart data={this.state.chartData}
-                          dataStatus={this.state.chartDataStatus}
-            />
-        </div>
+        <BitcoinChart data={this.state.chartData}
+                      dataStatus={this.state.chartDataStatus}/>
       </>
     )
   }
 }
 
 export default HistoricalData;
-

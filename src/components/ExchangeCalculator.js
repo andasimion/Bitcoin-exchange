@@ -14,23 +14,23 @@ const ExchangeCalculator = (props) => {
                     <InputGroup compact>
                         <Col xs={{ span: 8, offset: 0 }} >
                             <span>BTC</span>
-                            <Input style={{borderColor: props.bitcoinInputColor}} 
+                            <Input style={{borderColor: props.bitcoinColor}} 
                                     value={props.bitcoinAmount} 
-                                    onChange={props.convertBitcoinToFiat }
-                                />
-                            <span style={{color: props.bitcoinInputColor}}>
-                                {props.bitcoinInputColor === "red" ? "Provide a number greater than 0" : ""}
+                                    onChange={props.convertBitcoinToFiat}
+                            />
+                            <span style={{color: props.bitcoinColor}}>
+                                {props.bitcoinColor === "default" ? "" : "Provide a number greater than 0"}
                             </span>
                         </Col>
                         
                         <Col xs={{ span: 8, offset: 1 }} >
                             <span>{props.fiatCurrency}</span>
-                            <Input style={{borderColor: props.fiatInputColor}}
+                            <Input style={{borderColor: props.fiatColor}}
                                     value={props.fiatAmount}
                                     onChange={props.convertFiatToBitcoin}
                                 />
-                            <span style={{color: props.fiatInputColor}}>
-                                {props.fiatInputColor === "red" ? "Provide a number greater than 0" : ""}
+                            <span style={{color: props.fiatColor}}>
+                                {props.fiatColor === "default" ? "" : "Provide a number greater than 0"}
                             </span>
                         </Col>
                     </InputGroup>

@@ -138,7 +138,7 @@ class Calculator extends Component {
       let exchangeRatesStatus = prevState.exchangeRatesStatus;
       lastUpdatedStatus.status = "inProgress";
       exchangeRatesStatus.USD.status = "inProgress";
-      return {lastUpdatedStatus, exchangeRatesStatus};
+      return {lastUpdatedStatus, exchangeRatesStatus}
     })
     this.fetchRateForFiat(currentFiat)
       .then(() => this.setState(prevState => {
@@ -168,19 +168,17 @@ class Calculator extends Component {
     let bitcoinAmount = e.target.value;
     let fiatAmount = null;
     if(isNaN(bitcoinAmount) || parseFloat(bitcoinAmount) < 0) {
+      console.log(bitcoinAmount);
       this.setState({bitcoinInputColor: "red"});
       return;
     } else {
+      console.log(bitcoinAmount);
       fiatAmount = this.bitcoinPriceInFiat(bitcoinAmount, this.state.exchangeRates[this.state.currentFiat]);
-      this.setState(prevState => {
-        let bitcoinInputColor = prevState.bitcoinInputColor;
-        bitcoinInputColor = "default";
-      })
+      this.setState({ bitcoinInputColor : "default"})
       console.log(this.state.bitcoinInputColor)
     }
     this.setState({bitcoinAmount:bitcoinAmount, 
-                   fiatAmount:fiatAmount,
-                   bitcoinInputColor: "default"});
+                   fiatAmount:fiatAmount});
   }
 
   convertFiatToBitcoin = (e) => {
@@ -200,8 +198,6 @@ class Calculator extends Component {
                    fiatAmount:fiatAmount,
                    fiatInputColor: "default"});
   }
-
-
 
   render() {
     return (
@@ -231,8 +227,8 @@ class Calculator extends Component {
               convertFiatToBitcoin={this.convertFiatToBitcoin}
               bitcoinAmount={this.state.bitcoinAmount}
               fiatAmount={this.state.fiatAmount}
-              bitcoinInputColor={this.state.bitcoinInputColor}
-              fiatInputColor={this.state.fiatInputColor}
+              bitcoinColor={this.state.bitcoinInputColor}
+              fiatColor={this.state.fiatInputColor}
           />
         </div>
       </>
