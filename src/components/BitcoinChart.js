@@ -28,7 +28,8 @@ const BitcoinChart = (props) => {
                         legend:{
                             display: true,
                             position: 'top',
-                            }
+                            }, 
+                        maintainAspectRatio: true
                         }}
                     /> 
             }             
