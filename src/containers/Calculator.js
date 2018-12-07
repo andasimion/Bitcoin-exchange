@@ -18,8 +18,8 @@ class Calculator extends Component {
       lastUpdatedStatus: {status: "inProgress",
                           errorMessage: null
                          },
-      bitcoinInputColor: "default",
-      fiatInputColor: "default",
+      bitcoinInputClass: "successInput",
+      fiatInputClass: "successInput",
       exchangeRates: {
         USD: null,
         RON: null,
@@ -166,37 +166,33 @@ class Calculator extends Component {
 
   convertBitcoinToFiat = (e) => {
     let bitcoinAmount = e.target.value;
-    let fiatAmount = null;
+    console.log(bitcoinAmount)
     if(isNaN(bitcoinAmount) || parseFloat(bitcoinAmount) < 0) {
-      console.log(bitcoinAmount);
-      this.setState({bitcoinInputColor: "red"});
+      this.setState({bitcoinInputClass: "errorInput"});
       return;
     } else {
-      console.log(bitcoinAmount);
-      fiatAmount = this.bitcoinPriceInFiat(bitcoinAmount, this.state.exchangeRates[this.state.currentFiat]);
-      this.setState({ bitcoinInputColor : "default"})
-      console.log(this.state.bitcoinInputColor)
+      let fiatAmount = this.bitcoinPriceInFiat(bitcoinAmount, this.state.exchangeRates[this.state.currentFiat]);
+      this.setState({
+        bitcoinAmount: bitcoinAmount,
+        fiatAmount: fiatAmount,
+        bitcoinInputClass: "successInput"
+      });
     }
-    this.setState({bitcoinAmount:bitcoinAmount, 
-                   fiatAmount:fiatAmount});
   }
 
   convertFiatToBitcoin = (e) => {
     let fiatAmount = e.target.value;
-    let bitcoinAmount = null;
     if (isNaN(fiatAmount) || parseFloat(fiatAmount) < 0) {
-      this.setState({fiatInputColor: "red"});
+      this.setState({fiatInputClass: "errorInput"});
       return
     } else {
-      bitcoinAmount = String(fiatAmount / this.state.exchangeRates[this.state.currentFiat]);
-      this.setState(prevState => {
-        let fiatInputColor = prevState.fiatInputColor;
-        fiatInputColor = "default";
+      let bitcoinAmount = String(fiatAmount / this.state.exchangeRates[this.state.currentFiat]);
+      this.setState({
+        bitcoinAmount:bitcoinAmount, 
+        fiatAmount:fiatAmount,
+        fiatInputClass: "successInput"
       })
     }
-    this.setState({bitcoinAmount:bitcoinAmount, 
-                   fiatAmount:fiatAmount,
-                   fiatInputColor: "default"});
   }
 
   render() {
@@ -227,8 +223,8 @@ class Calculator extends Component {
               convertFiatToBitcoin={this.convertFiatToBitcoin}
               bitcoinAmount={this.state.bitcoinAmount}
               fiatAmount={this.state.fiatAmount}
-              bitcoinColor={this.state.bitcoinInputColor}
-              fiatColor={this.state.fiatInputColor}
+              bitcoinInputClass={this.state.bitcoinInputClass}
+              fiatInputClass={this.state.fiatInputClass}
           />
         </div>
       </>

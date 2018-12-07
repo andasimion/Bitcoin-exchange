@@ -1,6 +1,8 @@
 import React from 'react';
 import { Input, Row, Col } from 'antd';
 import PropTypes from 'prop-types';
+import './ExchangeCalculator.css';
+
 
 const InputGroup = Input.Group;
 
@@ -14,24 +16,20 @@ const ExchangeCalculator = (props) => {
                     <InputGroup compact>
                         <Col xs={{ span: 8, offset: 0 }} >
                             <span>BTC</span>
-                            <Input style={{borderColor: props.bitcoinColor}} 
+                            <Input className={props.bitcoinInputClass} 
                                     value={props.bitcoinAmount} 
                                     onChange={props.convertBitcoinToFiat}
                             />
-                            <span style={{color: props.bitcoinColor}}>
-                                {props.bitcoinColor === "default" ? "" : "Provide a number greater than 0"}
-                            </span>
+                            <span className={props.bitcoinInputClass}>Provide a number greater than 0</span>
                         </Col>
                         
                         <Col xs={{ span: 8, offset: 1 }} >
                             <span>{props.fiatCurrency}</span>
-                            <Input style={{borderColor: props.fiatColor}}
+                            <Input className={props.fiatInputClass}
                                     value={props.fiatAmount}
                                     onChange={props.convertFiatToBitcoin}
                                 />
-                            <span style={{color: props.fiatColor}}>
-                                {props.fiatColor === "default" ? "" : "Provide a number greater than 0"}
-                            </span>
+                            <span className={props.fiatInputClass}>Provide a number greater than 0</span>
                         </Col>
                     </InputGroup>
                 </Row> 

@@ -1,0 +1,16 @@
+input.successInput {
+    border-color: default;
+
+}
+
+span.successInput {
+    display: none;
+}
+
+input.errorInput {
+    border-color: red;
+}
+
+span.errorInput {
+    color: red;
+}

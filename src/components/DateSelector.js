@@ -8,7 +8,7 @@ const { RangePicker } = DatePicker;
 const dateFormat = 'YYYY-MM-DD';
 
 const disabledDate = (current) => {
-    return (current && current < moment("2010-07-16", dateFormat).endOf()) || current > moment();
+    return (current && current < moment("2010-07-16", dateFormat).endOf()) || current > moment().subtract(1, "days");
 }
 
 

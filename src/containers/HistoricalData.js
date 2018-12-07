@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card } from 'antd';
+import { Row, Col } from 'antd';
 import BitcoinInUSD from '../components/BitcoinInUSD';
 import DateSelector from '../components/DateSelector';
 import BitcoinChart from '../components/BitcoinChart';
@@ -158,7 +158,8 @@ class HistoricalData extends Component {
       endDate = moment().subtract(1, "days");
       return {lastUpdatedStatus, exchangeRateUSDStatus, chartDataStatus, startDate, endDate};
     })
-    this.fetchHistoricalData(this.state.startDate.format('YYYY-MM-DD'), this.state.endDate.format('YYYY-MM-DD'))
+    this.fetchHistoricalData(moment().subtract(7, "days").format('YYYY-MM-DD'), 
+                             moment().subtract(1, "days").format('YYYY-MM-DD'))
       .finally(() => Promise.all([
         this.fetchRateForFiat("USD"),
         this.fetchLastUpdatedUSDRate()
@@ -185,6 +186,7 @@ class HistoricalData extends Component {
                         endDate={this.state.endDate}
                         onChange={this.onChange}
         />
+        <br/>
         <br/>
         <BitcoinChart data={this.state.chartData}
                       dataStatus={this.state.chartDataStatus}/>
