@@ -5,21 +5,23 @@ import BitcoinInUSD from '../components/BitcoinInUSD';
 import ExchangeCalculator from '../components/ExchangeCalculator';
 import ReloadButton from '../components/ReloadButton';
 import { getLastUpdatedBTCInUSDExchangeRate, getLatestBTCInFiatExchangeRate } from '../apiCalls';
+import ls from 'local-storage';
 
 
 class Calculator extends Component {
   constructor(props) {
+    console.log("constructor")
     super(props);
     this.state = {
       currentFiat: "USD",
       bitcoinAmount: null,
       fiatAmount: null,
+      bitcoinInputClass: "successInput",
+      fiatInputClass: "successInput",
       lastUpdated: null,
       lastUpdatedStatus: {status: "inProgress",
                           errorMessage: null
                          },
-      bitcoinInputClass: "successInput",
-      fiatInputClass: "successInput",
       exchangeRates: {
         USD: null,
         RON: null,
@@ -39,7 +41,7 @@ class Calculator extends Component {
         GBP: {status: "inProgress",
               errorMessage: null
              },
-      }
+      },
     };
   
   this.setNewFiatCurrency = this.setNewFiatCurrency.bind(this);
@@ -54,6 +56,7 @@ class Calculator extends Component {
   }
 
   componentDidMount() {
+    console.log("componentDidMount")
     this.fetchRateForFiat("USD")
       .finally(() => Promise.all([
         this.fetchOtherFiatRates("USD"),
@@ -196,6 +199,7 @@ class Calculator extends Component {
   }
 
   render() {
+    console.log("render")
     return (
       <>
         <Row>
