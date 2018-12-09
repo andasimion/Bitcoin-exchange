@@ -53,8 +53,7 @@ class Calculator extends Component {
   this.updateExchangeRateOnSuccess = this.updateExchangeRateOnSuccess.bind(this);
   this.updateExchangeRateOnError = this.updateExchangeRateOnError.bind(this);
   this.refresh = this.refresh.bind(this);
-  }
-
+  } 
   componentDidMount() {
     console.log("componentDidMount")
     this.fetchRateForFiat("USD")
@@ -64,13 +63,27 @@ class Calculator extends Component {
       ]))
   }
 
-  fetchRateForFiat = (fiat) => getLatestBTCInFiatExchangeRate(fiat)
-    .then(response => {
-      this.updateExchangeRateOnSuccess(response, fiat);
-    })
-    .catch(error => {
-      this.updateExchangeRateOnError(error, fiat);
-    })
+  fetchRateForFiat = (fiat) => {
+    let rateKey = 'exchangeRate'+fiat;
+    let rateInLocalStorage = ls.get(rateKey);
+    let lastUpdatedKey = 'lastUpdatedRate'+fiat;
+    let rateLastUpdatedInLocalStorage = ls.get(lastUpdatedKey);
+    if (rateInLocalStorage && rateLastUpdatedInLocalStorage) {
+      this.updateExchangeRateOnSuccess(rateInLocalStorage, fiat);
+      return Promise.resolve(null);
+    } else {
+      return getLatestBTCInFiatExchangeRate(fiat)
+      .then(response => {
+        let newRate = response.data.bpi[fiat].rate_float;
+        this.updateExchangeRateOnSuccess(newRate, fiat);
+        ls.set(rateKey, newRate);
+        ls.set(lastUpdatedKey, new Date());
+      })
+      .catch(error => {
+        this.updateExchangeRateOnError(error, fiat);
+      })
+    }
+  }
 
   fetchOtherFiatRates = (exceptFiat) => {
     let otherFiats = Object.keys(this.state.exchangeRates).filter((fiat) => fiat !== exceptFiat);
@@ -107,13 +120,13 @@ class Calculator extends Component {
     });
   }
     
-  updateExchangeRateOnSuccess = (response, fiat) => {
+  updateExchangeRateOnSuccess = (rate, fiat) => {
     this.setState(
       prevState => {
         let exchangeRates = prevState.exchangeRates;
         let exchangeRatesStatus = prevState.exchangeRatesStatus;
         
-        exchangeRates[fiat] = response.data.bpi[fiat].rate_float;
+        exchangeRates[fiat] = rate;
         exchangeRatesStatus[fiat] = {status: "success",
                                      errorMessage: null};
         return {exchangeRates, exchangeRatesStatus} 
