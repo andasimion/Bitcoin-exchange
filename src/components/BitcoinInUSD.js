@@ -4,6 +4,7 @@ import { Alert } from 'antd';
 import Spinner from './Spinner';
 
 const BitcoinInUSD = (props) => {
+    console.log(props);
     return (
         <React.Fragment>
             <div>
