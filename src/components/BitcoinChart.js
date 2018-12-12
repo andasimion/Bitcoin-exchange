@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert } from 'antd';
+import Alert from './Alert';
 import Spinner from './Spinner';
 import { Line } from 'react-chartjs-2';
 
@@ -11,11 +11,7 @@ const BitcoinChart = (props) => {
             {
             props.dataStatus.status === "inProgress" ? <Spinner size="large" style={{display: 'flex', justifyContent: 'center'}}/> :
                 props.dataStatus.status === "error" ?
-                    <Alert 
-                    message="Error"
-                    description={props.dataStatus.errorMessage}
-                    type="error"
-                    showIcon /> 
+                    <Alert errorMessage={props.dataStatus.errorMessage} />
                     :
                     <Line
                     data={chartData}

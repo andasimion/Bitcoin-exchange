@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Alert } from 'antd';
+import Alert from './Alert';
 import Spinner from './Spinner';
 
 const BitcoinInUSD = (props) => {
@@ -9,34 +9,22 @@ const BitcoinInUSD = (props) => {
         <React.Fragment>
             <div>
                 <span>
-                    <span>Current BTC price in USD: </span> 
-                        <span>   
-                            {
-                            props.USDStatus.status === "inProgress" ? <Spinner size="small"/> :
-                                props.USDStatus.status === "error" ? 
-                                    <Alert 
-                                        message="Error"
-                                        description={props.USDStatus.errorMessage}
-                                        type="error"
-                                        showIcon /> : props.USDValue
-                            }
-                        </span> 
+                    Current BTC price in USD: {' '}   
+                        {
+                        props.USDStatus.status === "inProgress" ? <Spinner size="small"/> :
+                            props.USDStatus.status === "error" ? 
+                                <Alert errorMessage={props.USDStatus.errorMessage}/> : props.USDValue
+                        }
                 </span>
             </div>
             <div>
                 <span style={{fontSize: "small"}}>
-                    <span>Last updated: </span>
-                        <span>
+                    Last updated: {' '}
                         {
                         props.lastUpdatedStatus.status === "inProgress" ? <Spinner size="small"/> :
                                     props.lastUpdatedStatus.status === "error" ?  
-                                        <Alert 
-                                        message="Error"
-                                        description={props.lastUpdatedStatus.errorMessage}
-                                        type="error"
-                                        showIcon /> : props.lastUpdated
+                                        <Alert errorMessage={props.lastUpdatedStatus.errorMessage} /> : props.lastUpdated
                         }
-                        </span>
                 </span>
             </div>
         </React.Fragment>
