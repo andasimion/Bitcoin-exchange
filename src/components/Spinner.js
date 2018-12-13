@@ -3,6 +3,7 @@ import { Spin } from 'antd';
 
 
 const Spinner = (props) => {
+    
     return(
         <Spin  size={props.size} style={props.style}/>
     )

@@ -1,19 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Alert from './Alert';
+import AlertError from './AlertError';
 import Spinner from './Spinner';
 
 const BitcoinInUSD = (props) => {
     console.log(props);
+    let spinner = <Spinner size="small"/>;
+    let USDRateAlertError = <AlertError errorMessage={props.USDStatus.errorMessage}/>;
+    let lastUpdatedAlertError = <AlertError errorMessage={props.lastUpdatedStatus.errorMessage} />
     return (
         <React.Fragment>
             <div>
                 <span>
                     Current BTC price in USD: {' '}   
                         {
-                        props.USDStatus.status === "inProgress" ? <Spinner size="small"/> :
-                            props.USDStatus.status === "error" ? 
-                                <Alert errorMessage={props.USDStatus.errorMessage}/> : props.USDValue
+                        props.USDStatus.status === "inProgress" ? 
+                            spinner :
+                                props.USDStatus.status === "error" ? 
+                                    USDRateAlertError : 
+                                        props.USDValue
                         }
                 </span>
             </div>
@@ -21,9 +26,11 @@ const BitcoinInUSD = (props) => {
                 <span style={{fontSize: "small"}}>
                     Last updated: {' '}
                         {
-                        props.lastUpdatedStatus.status === "inProgress" ? <Spinner size="small"/> :
-                                    props.lastUpdatedStatus.status === "error" ?  
-                                        <Alert errorMessage={props.lastUpdatedStatus.errorMessage} /> : props.lastUpdated
+                        props.lastUpdatedStatus.status === "inProgress" ? 
+                            spinner :
+                                props.lastUpdatedStatus.status === "error" ?  
+                                    lastUpdatedAlertError : 
+                                        props.lastUpdated
                         }
                 </span>
             </div>

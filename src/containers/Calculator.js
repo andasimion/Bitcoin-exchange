@@ -10,7 +10,6 @@ import ls from 'local-storage';
 
 class Calculator extends Component {
   constructor(props) {
-    console.log("constructor")
     super(props);
     this.state = {
       currentFiat: "USD",
@@ -57,7 +56,6 @@ class Calculator extends Component {
   this.refresh = this.refresh.bind(this);
   } 
   componentDidMount() {
-    console.log("componentDidMount")
     this.fetchRateForFiat("USD")
       .finally(() => Promise.all([
         this.fetchOtherFiatRates("USD"),
@@ -66,25 +64,29 @@ class Calculator extends Component {
   }
 
   fetchRateForFiat = (fiat) => {
-    let rateKey = `exchangeRate${fiat}`;
+    let rateKey = fiat;
     let rateInLocalStorage = ls.get(rateKey);
     let rateTimestampKey = `${fiat}Timestamp`;
     let rateTimestampInLocalStorage = ls.get(rateTimestampKey);
+    let now = Date.now();
     let rateDate = rateTimestampInLocalStorage && new Date(parseInt(rateTimestampInLocalStorage));
-    let now = new Date();
     let rateDateAge = Math.round((now - rateDate)/(1000*60));
     let notTooOld = rateDateAge <= 1;
+    console.log(notTooOld);
+    console.log("rate1", rateInLocalStorage)
 
     if (rateInLocalStorage && notTooOld) {
       this.updateExchangeRateOnSuccess(rateInLocalStorage, fiat);
+      console.log("rate2", rateInLocalStorage)
       return Promise.resolve(null);
     } else {
+      console.log("info received from AXIOS")
       return getLatestBTCInFiatExchangeRate(fiat)
       .then(response => {
         let newRate = response.data.bpi[fiat].rate_float;
         this.updateExchangeRateOnSuccess(newRate, fiat);
         ls.set(rateKey, newRate);
-        ls.set(rateTimestampKey, new Date());
+        ls.set(rateTimestampKey, Date.now());
       })
       .catch(error => {
         this.updateExchangeRateOnError(error, fiat);
@@ -238,7 +240,6 @@ class Calculator extends Component {
   }
 
   render() {
-    console.log("render")
     return (
       <>
         <Row>

@@ -2,7 +2,7 @@ import React from 'react';
 import { Alert } from 'antd';
 
 const AlertError = (props) => {
-    return(
+    return (
         <Alert 
             message="Error"
             description={props.errorMessage}

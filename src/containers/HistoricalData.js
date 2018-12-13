@@ -144,7 +144,7 @@ class HistoricalData extends Component {
 
   }
 
-  refresh = (e) => {
+  refresh = () => {
     this.setState(prevState => {
       let lastUpdatedStatus = prevState.lastUpdatedStatus;
       let exchangeRateUSDStatus = prevState.exchangeRateUSDStatus;
