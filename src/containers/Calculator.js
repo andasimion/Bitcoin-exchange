@@ -55,6 +55,7 @@ class Calculator extends Component {
   this.updateLastUpdatedOnError = this.updateLastUpdatedOnError.bind(this);
   this.refresh = this.refresh.bind(this);
   } 
+
   componentDidMount() {
     this.fetchRateForFiat("USD")
       .finally(() => Promise.all([
@@ -65,22 +66,19 @@ class Calculator extends Component {
 
   fetchRateForFiat = (fiat) => {
     let rateKey = fiat;
-    let rateInLocalStorage = ls.get(rateKey);
+    let rateInLocalStorage = ls.get(rateKey); // null if rate is not in LocalStorage
     let rateTimestampKey = `${fiat}Timestamp`;
     let rateTimestampInLocalStorage = ls.get(rateTimestampKey);
-    let now = Date.now();
-    let rateDate = rateTimestampInLocalStorage && new Date(parseInt(rateTimestampInLocalStorage));
-    let rateDateAge = Math.round((now - rateDate)/(1000*60));
+    let now = new Date();
+    //if rateTimestamp is in local storage rateDate is a date and if not rateDate is null
+    let rateDate = rateTimestampInLocalStorage && new Date(parseInt(rateTimestampInLocalStorage)); 
+    let rateDateAge = Math.round((now - rateDate)/(1000*60)); // null is converted to 0 
     let notTooOld = rateDateAge <= 1;
-    console.log(notTooOld);
-    console.log("rate1", rateInLocalStorage)
 
     if (rateInLocalStorage && notTooOld) {
       this.updateExchangeRateOnSuccess(rateInLocalStorage, fiat);
-      console.log("rate2", rateInLocalStorage)
       return Promise.resolve(null);
     } else {
-      console.log("info received from AXIOS")
       return getLatestBTCInFiatExchangeRate(fiat)
       .then(response => {
         let newRate = response.data.bpi[fiat].rate_float;
@@ -100,10 +98,41 @@ class Calculator extends Component {
     return Promise.all(promises);
   }
 
+  updateExchangeRateOnSuccess = (rate, fiat) => {
+    this.setState(
+      prevState => {
+        let exchangeRates = prevState.exchangeRates;
+        let exchangeRatesStatus = prevState.exchangeRatesStatus;
+        
+        exchangeRates[fiat] = rate;
+        exchangeRatesStatus[fiat] = {status: "success",
+                                     errorMessage: null};
+        return {exchangeRates, exchangeRatesStatus} 
+      }
+    );
+  }
+
+  updateExchangeRateOnError = (error, fiat) => {
+    this.setState(
+      prevState => {
+        let exchangeRates = prevState.exchangeRates;
+        let exchangeRatesStatus = prevState.exchangeRatesStatus;
+        exchangeRates[fiat] = null;
+        exchangeRatesStatus[fiat] = {status: "error",
+                                     errorMessage: error.message};
+        return {exchangeRates, exchangeRatesStatus} 
+      }
+    );
+  }
+
   fetchLastUpdatedUSDRate = () => {
     let lastUpdatedUSDInLocalStorage = ls.get('lastUpdatedUSD');
     let lastUpdatedTimestampInLocalStorage= ls.get('lastUpdatedUSDTimestamp');
-    if (lastUpdatedUSDInLocalStorage && lastUpdatedTimestampInLocalStorage) {
+    let lastUpdatedDate = lastUpdatedTimestampInLocalStorage && new Date(parseInt(lastUpdatedTimestampInLocalStorage))
+    let now = Date.now();
+    let lastUpdatedDateAge = Math.round((now-lastUpdatedDate)/(1000*60))
+    let notTooOld = lastUpdatedDateAge <= 1;
+    if (lastUpdatedUSDInLocalStorage && notTooOld) {
       this.updateLastUpdatedOnSuccess(lastUpdatedUSDInLocalStorage);
       return Promise.resolve(null);
     } else {
@@ -112,7 +141,7 @@ class Calculator extends Component {
         let newLastUpdated = response.data.time.updated;
         this.updateLastUpdatedOnSuccess(newLastUpdated);
         ls.set('lastUpdatedUSD', newLastUpdated);
-        ls.set('lastUpdatedUSDTimestamp', new Date());
+        ls.set('lastUpdatedUSDTimestamp', Date.now());
       })
       .catch(error => {
         this.updateLastUpdatedOnError(error);
@@ -144,33 +173,6 @@ class Calculator extends Component {
         lastUpdatedStatus = {status: "error",
                             errorMessage: error.message};
         return {lastUpdated, lastUpdatedStatus};
-      }
-    );
-  }
-
-  updateExchangeRateOnSuccess = (rate, fiat) => {
-    this.setState(
-      prevState => {
-        let exchangeRates = prevState.exchangeRates;
-        let exchangeRatesStatus = prevState.exchangeRatesStatus;
-        
-        exchangeRates[fiat] = rate;
-        exchangeRatesStatus[fiat] = {status: "success",
-                                     errorMessage: null};
-        return {exchangeRates, exchangeRatesStatus} 
-      }
-    );
-  }
-
-  updateExchangeRateOnError = (error, fiat) => {
-    this.setState(
-      prevState => {
-        let exchangeRates = prevState.exchangeRates;
-        let exchangeRatesStatus = prevState.exchangeRatesStatus;
-        exchangeRates[fiat] = null;
-        exchangeRatesStatus[fiat] = {status: "error",
-                                     errorMessage: error.message};
-        return {exchangeRates, exchangeRatesStatus} 
       }
     );
   }

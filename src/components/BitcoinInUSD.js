@@ -4,7 +4,6 @@ import AlertError from './AlertError';
 import Spinner from './Spinner';
 
 const BitcoinInUSD = (props) => {
-    console.log(props);
     let spinner = <Spinner size="small"/>;
     let USDRateAlertError = <AlertError errorMessage={props.USDStatus.errorMessage}/>;
     let lastUpdatedAlertError = <AlertError errorMessage={props.lastUpdatedStatus.errorMessage} />
