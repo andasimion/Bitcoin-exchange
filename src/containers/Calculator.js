@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Row, Col } from 'antd';
 import Fiat from '../components/Fiat';
-import BitcoinInUSD from '../components/BitcoinInUSD';
+import LastBitcoinInUSDRate from './LastBitcoinInUSDRate';
 import ExchangeCalculator from '../components/ExchangeCalculator';
 import ReloadButton from '../components/ReloadButton';
-import { getLastUpdatedBTCInUSDExchangeRate, getLatestBTCInFiatExchangeRate } from '../apiCalls';
+import { getLatestBTCInFiatExchangeRate } from '../apiCalls';
 import ls from 'local-storage';
 
 
@@ -17,10 +17,6 @@ class Calculator extends Component {
       fiatAmount: null,
       bitcoinInputClass: "successInput",
       fiatInputClass: "successInput",
-      lastUpdated: null,
-      lastUpdatedStatus: {status: "inProgress",
-                          errorMessage: null
-                         },
       exchangeRates: {
         USD: null,
         RON: null,
@@ -48,11 +44,9 @@ class Calculator extends Component {
   this.convertFiatToBitcoin  = this.convertFiatToBitcoin.bind(this);
   this.fetchRateForFiat = this.fetchRateForFiat.bind(this);
   this.fetchOtherFiatRates = this.fetchOtherFiatRates.bind(this);
-  this.fetchLastUpdatedUSDRate = this.fetchLastUpdatedUSDRate.bind(this);
   this.updateExchangeRateOnSuccess = this.updateExchangeRateOnSuccess.bind(this);
   this.updateExchangeRateOnError = this.updateExchangeRateOnError.bind(this);
-  this.updateLastUpdatedOnSuccess = this.updateLastUpdatedOnSuccess.bind(this);
-  this.updateLastUpdatedOnError = this.updateLastUpdatedOnError.bind(this);
+ 
   this.refresh = this.refresh.bind(this);
   } 
 
@@ -60,7 +54,6 @@ class Calculator extends Component {
     this.fetchRateForFiat("USD")
       .finally(() => Promise.all([
         this.fetchOtherFiatRates("USD"),
-        this.fetchLastUpdatedUSDRate()
       ]))
   }
 
@@ -125,58 +118,6 @@ class Calculator extends Component {
     );
   }
 
-  fetchLastUpdatedUSDRate = () => {
-    let lastUpdatedUSDInLocalStorage = ls.get('lastUpdatedUSD');
-    let lastUpdatedTimestampInLocalStorage= ls.get('lastUpdatedUSDTimestamp');
-    let lastUpdatedDate = lastUpdatedTimestampInLocalStorage && new Date(parseInt(lastUpdatedTimestampInLocalStorage))
-    let now = Date.now();
-    let lastUpdatedDateAge = Math.round((now-lastUpdatedDate)/(1000*60))
-    let notTooOld = lastUpdatedDateAge <= 1;
-    if (lastUpdatedUSDInLocalStorage && notTooOld) {
-      this.updateLastUpdatedOnSuccess(lastUpdatedUSDInLocalStorage);
-      return Promise.resolve(null);
-    } else {
-    return getLastUpdatedBTCInUSDExchangeRate()
-      .then(response => {
-        let newLastUpdated = response.data.time.updated;
-        this.updateLastUpdatedOnSuccess(newLastUpdated);
-        ls.set('lastUpdatedUSD', newLastUpdated);
-        ls.set('lastUpdatedUSDTimestamp', Date.now());
-      })
-      .catch(error => {
-        this.updateLastUpdatedOnError(error);
-      });
-    }
-  }
-
-  updateLastUpdatedOnSuccess = (lastUpdatedValue) => {
-    this.setState(
-      prevState => {
-        let lastUpdated = prevState.lastUpdated;
-        let lastUpdatedStatus = prevState.lastUpdatedStatus;
-
-        lastUpdated = lastUpdatedValue;
-        lastUpdatedStatus = {status: "success",
-                            errorMessage: null};
-        return {lastUpdated, lastUpdatedStatus};
-      }
-    )
-  }
-
-  updateLastUpdatedOnError = (error) => {
-    this.setState(
-      prevState => {
-        let lastUpdated = prevState.lastUpdated;
-        let lastUpdatedStatus = prevState.lastUpdatedStatus;
-
-        lastUpdated = null;
-        lastUpdatedStatus = {status: "error",
-                            errorMessage: error.message};
-        return {lastUpdated, lastUpdatedStatus};
-      }
-    );
-  }
-  
   refresh = () => {
     let currentFiat = this.state.currentFiat;
     this.setState(prevState => {
@@ -256,11 +197,7 @@ class Calculator extends Component {
         </Row>
         <br/>
         <div>
-          <BitcoinInUSD USDValue={this.state.exchangeRates["USD"]} 
-                        USDStatus={this.state.exchangeRatesStatus["USD"]}
-                        lastUpdated={this.state.lastUpdated}
-                        lastUpdatedStatus={this.state.lastUpdatedStatus}
-          />  
+          <LastBitcoinInUSDRate/>  
         </div>
         <br/>
         <div>

@@ -1,26 +1,17 @@
 import React, { Component } from 'react';
 import { Row, Col } from 'antd';
-import BitcoinInUSD from '../components/BitcoinInUSD';
+import LastBitcoinInUSDRate from './LastBitcoinInUSDRate';
 import DateSelector from '../components/DateSelector';
 import BitcoinChart from '../components/BitcoinChart';
 import ReloadButton from '../components/ReloadButton';
-import { getLastUpdatedBTCInUSDExchangeRate, getLatestBTCInFiatExchangeRate, getHistoricalData } from '../apiCalls';
+import { getHistoricalData } from '../apiCalls';
 import moment from 'moment';
-import ls from 'local-storage';
 
 
 class HistoricalData extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      lastUpdated: null,
-      lastUpdatedStatus: {status: "inProgress",
-                          errorMessage: null
-                         },               
-      exchangeRateUSD: null, 
-      exchangeRateUSDStatus: {status: "inProgress",
-                              errorMessage: null
-                             },
+    this.state = {              
       startDate: moment().subtract(7, "days"),
       endDate: moment().subtract(1, "day"),
       chartData: {}, 
@@ -29,13 +20,7 @@ class HistoricalData extends Component {
     }
     
     this.onChange = this.onChange.bind(this);
-    this.refresh = this.refresh.bind(this);
-    this.fetchRateForFiat = this.fetchRateForFiat.bind(this);
-    this.updateExchangeRateOnSuccess = this.updateExchangeRateOnSuccess.bind(this);
-    this.updateExchangeRateOnError = this.updateExchangeRateOnError.bind(this);
-    this.fetchLastUpdatedUSDRate = this.fetchLastUpdatedUSDRate.bind(this);
-    this.updateLastUpdatedOnSuccess = this.updateLastUpdatedOnSuccess.bind(this);
-    this.updateLastUpdatedOnError = this.updateLastUpdatedOnError.bind(this);
+    //this.refresh = this.refresh.bind(this);
     this.fetchHistoricalData = this.fetchHistoricalData.bind(this);
     this.updateHistoryDataOnSuccess = this.updateHistoryDataOnSuccess.bind(this);
     this.updateHistoryDataOnError = this.updateHistoryDataOnError.bind(this);
@@ -43,118 +28,9 @@ class HistoricalData extends Component {
   
   componentDidMount() { 
     this.fetchHistoricalData(this.state.startDate.format('YYYY-MM-DD'), 
-                             this.state.endDate.format('YYYY-MM-DD'))
-      .finally(() => Promise.all([
-        this.fetchRateForFiat("USD"),
-        this.fetchLastUpdatedUSDRate()
-      ]))
+                             this.state.endDate.format('YYYY-MM-DD'));
   }
   
-  fetchRateForFiat = (fiat) => {
-    let rateKey = fiat;
-    let rateInLocalStorage = ls.get(rateKey);
-    let rateTimestampKey = `${fiat}Timestamp`;
-    let rateTimestampInLocalStorage = ls.get(rateTimestampKey);
-    let now = new Date();
-    let rateDate = rateTimestampInLocalStorage && new Date(parseInt(rateTimestampInLocalStorage));
-    let rateDateAge = Math.round((now - rateDate)/(1000 * 60));
-    let notTooOld = rateDateAge <= 1;
-
-    if (rateInLocalStorage && notTooOld) {
-      this.updateExchangeRateOnSuccess(rateInLocalStorage, fiat);
-      return Promise.resolve(null);
-    } else {
-      return getLatestBTCInFiatExchangeRate(fiat)
-        .then(response => {
-          let newRate = response.data.bpi[fiat].rate_float;
-          this.updateExchangeRateOnSuccess(newRate, fiat);
-          ls.set(rateKey, newRate);
-          ls.set(rateTimestampKey, Date.now());
-        })
-        .catch(error => {
-          this.updateExchangeRateOnError(error, fiat);
-        })
-    }
-  }
-
-  updateExchangeRateOnSuccess = (rate, fiat) => {
-    this.setState(
-      prevState => {
-        let exchangeRateUSD = prevState.exchangeRateUSD;
-        let exchangeRateUSDStatus = prevState.exchangeRateUSDStatus;
-        exchangeRateUSD = rate;
-        exchangeRateUSDStatus = {status: "success",
-                                 errorMessage: null};
-        return {exchangeRateUSD, exchangeRateUSDStatus};
-      }
-    )
-  }
-  
-  updateExchangeRateOnError = (error, fiat) => {
-    this.setState(
-      prevState => {
-        let exchangeRateUSD = prevState.exchangeRateUSD;
-        let exchangeRateUSDStatus = prevState.exchangeRateUSDStatus;
-        exchangeRateUSD = null;
-        exchangeRateUSDStatus = {status: "error",
-                                 errorMessage: error.message};
-        return {exchangeRateUSD, exchangeRateUSDStatus};
-      }
-    )
-  }
-
-  fetchLastUpdatedUSDRate = () => {
-    let lastUpdatedUSDInLocalStorage = ls.get('lastUpdatedUSD');
-    let lastUpdatedTimestampInLocalStorage= ls.get('lastUpdatedUSDTimestamp');
-    let lastUpdatedDate = lastUpdatedTimestampInLocalStorage && new Date(parseInt(lastUpdatedTimestampInLocalStorage))
-    let now = Date.now();
-    let lastUpdatedDateAge = Math.round((now-lastUpdatedDate)/(1000*60))
-    let notTooOld = lastUpdatedDateAge <= 1;
-    if (lastUpdatedUSDInLocalStorage && notTooOld) {
-      this.updateLastUpdatedOnSuccess(lastUpdatedUSDInLocalStorage);
-      return Promise.resolve(null);
-    } else {
-    return getLastUpdatedBTCInUSDExchangeRate()
-      .then(response => {
-        let newLastUpdated = response.data.time.updated;
-        this.updateLastUpdatedOnSuccess(newLastUpdated);
-        ls.set('lastUpdatedUSD', newLastUpdated);
-        ls.set('lastUpdatedUSDTimestamp', Date.now());
-      })
-      .catch(error => {
-        this.updateLastUpdatedOnError(error);
-      });
-    }
-  }
-
-  updateLastUpdatedOnSuccess = (lastUpdatedValue) => {
-    this.setState(
-      prevState => {
-        let lastUpdated = prevState.lastUpdated;
-        let lastUpdatedStatus = prevState.lastUpdatedStatus;
-
-        lastUpdated = lastUpdatedValue;
-        lastUpdatedStatus = {status: "success",
-                            errorMessage: null};
-        return {lastUpdated, lastUpdatedStatus};
-      }
-    )
-  }
-
-  updateLastUpdatedOnError = (error) => {
-    this.setState(
-      prevState => {
-        let lastUpdated = prevState.lastUpdated;
-        let lastUpdatedStatus = prevState.lastUpdatedStatus;
-
-        lastUpdated = null;
-        lastUpdatedStatus = {status: "error",
-                            errorMessage: error.message};
-        return {lastUpdated, lastUpdatedStatus};
-      }
-    );
-  }
-
   fetchHistoricalData = (startDate, endDate) => {
     
     return getHistoricalData(startDate, endDate)
@@ -204,7 +80,7 @@ class HistoricalData extends Component {
 
   }
 
-  refresh = () => {
+  /*refresh = () => {
     this.setState(prevState => {
       let lastUpdatedStatus = prevState.lastUpdatedStatus;
       let exchangeRateUSDStatus = prevState.exchangeRateUSDStatus;
@@ -224,18 +100,14 @@ class HistoricalData extends Component {
         this.fetchRateForFiat("USD"),
         this.fetchLastUpdatedUSDRate()
       ]))
-  }
+  }*/
 
   render() {
     return (
       <> 
         <Row>
           <Col span={8}>
-            <BitcoinInUSD USDValue={this.state.exchangeRateUSD}
-                          USDStatus={this.state.exchangeRateUSDStatus} 
-                          lastUpdated={this.state.lastUpdated}
-                          lastUpdatedStatus={this.state.lastUpdatedStatus}
-            /> 
+            <LastBitcoinInUSDRate />
           </Col> 
           <Col span={1} offset={15}>
             <ReloadButton refresh={this.refresh}/>
