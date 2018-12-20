@@ -4,10 +4,10 @@ import PropTypes from 'prop-types';
 
 const Option = Select.Option;
 
-const Fiat = (props) => {
+const FiatDropdown = (props) => {
 
     return (
-        <React.Fragment>
+        <>
             <span>Fiat </span> 
             <Select defaultValue={props.fiatCurrency} style={{ width: 120 }} onChange={props.handleChange}>
                 <Option value="USD">USD</Option>
@@ -15,14 +15,14 @@ const Fiat = (props) => {
                 <Option value="EUR">EUR</Option>
                 <Option value="GBP">GBP</Option>
             </Select>
-        </React.Fragment>
+        </>
     );
 }
 
-Fiat.propTypes = {
+FiatDropdown.propTypes = {
     fiatCurrency: PropTypes.string,
     handleChange: PropTypes.func,
 }
 
 
-export default Fiat;
+export default FiatDropdown;

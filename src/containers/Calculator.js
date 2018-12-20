@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { Row, Col } from 'antd';
-import Fiat from '../components/Fiat';
-import LastBitcoinInUSDRate from './LastBitcoinInUSDRate';
+import FiatDropdown from '../components/FiatDropdown';
+import BitcoinInUSD from '../components/BitcoinInUSD';
 import ExchangeCalculator from '../components/ExchangeCalculator';
 import ReloadButton from '../components/ReloadButton';
-import { getLatestBTCInFiatExchangeRate } from '../apiCalls';
+import { getLastUpdatedBTCInUSDExchangeRate, getLatestBTCInFiatExchangeRate } from '../apiCalls';
 import ls from 'local-storage';
+
 
 
 class Calculator extends Component {
@@ -17,6 +18,10 @@ class Calculator extends Component {
       fiatAmount: null,
       bitcoinInputClass: "successInput",
       fiatInputClass: "successInput",
+      lastUpdated: null,
+      lastUpdatedStatus: {status: "inProgress",
+                          errorMessage: null
+                          },  
       exchangeRates: {
         USD: null,
         RON: null,
@@ -39,6 +44,9 @@ class Calculator extends Component {
       },
     };
   
+  this.fetchLastUpdatedUSDRate = this.fetchLastUpdatedUSDRate.bind(this);
+  this.updateLastUpdatedOnSuccess = this.updateLastUpdatedOnSuccess.bind(this);
+  this.updateLastUpdatedOnError = this.updateLastUpdatedOnError.bind(this);
   this.setNewFiatCurrency = this.setNewFiatCurrency.bind(this);
   this.convertBitcoinToFiat  = this.convertBitcoinToFiat.bind(this);
   this.convertFiatToBitcoin  = this.convertFiatToBitcoin.bind(this);
@@ -46,6 +54,9 @@ class Calculator extends Component {
   this.fetchOtherFiatRates = this.fetchOtherFiatRates.bind(this);
   this.updateExchangeRateOnSuccess = this.updateExchangeRateOnSuccess.bind(this);
   this.updateExchangeRateOnError = this.updateExchangeRateOnError.bind(this);
+  this.fetchLastUpdatedUSDRate = this.fetchLastUpdatedUSDRate.bind(this);
+  this.updateLastUpdatedOnSuccess = this.updateLastUpdatedOnSuccess.bind(this);
+  this.updateLastUpdatedOnError = this.updateLastUpdatedOnError.bind(this);
  
   this.refresh = this.refresh.bind(this);
   } 
@@ -54,6 +65,7 @@ class Calculator extends Component {
     this.fetchRateForFiat("USD")
       .finally(() => Promise.all([
         this.fetchOtherFiatRates("USD"),
+        this.fetchLastUpdatedUSDRate()
       ]))
   }
 
@@ -116,6 +128,58 @@ class Calculator extends Component {
         return {exchangeRates, exchangeRatesStatus} 
       }
     );
+  }
+
+  fetchLastUpdatedUSDRate = () => {
+    let lastUpdatedUSDInLocalStorage = ls.get('lastUpdatedUSD');
+    let lastUpdatedTimestampInLocalStorage= ls.get('lastUpdatedUSDTimestamp');
+    let lastUpdatedDate = lastUpdatedTimestampInLocalStorage && new Date(parseInt(lastUpdatedTimestampInLocalStorage))
+    let now = Date.now();
+    let lastUpdatedDateAge = Math.round((now-lastUpdatedDate)/(1000*60))
+    let notTooOld = lastUpdatedDateAge <= 1;
+    if (lastUpdatedUSDInLocalStorage && notTooOld) {
+        this.updateLastUpdatedOnSuccess(lastUpdatedUSDInLocalStorage);
+        return Promise.resolve(null);
+    } else {
+        return getLastUpdatedBTCInUSDExchangeRate()
+            .then(response => {
+            let newLastUpdated = response.data.time.updated;
+            this.updateLastUpdatedOnSuccess(newLastUpdated);
+            ls.set('lastUpdatedUSD', newLastUpdated);
+            ls.set('lastUpdatedUSDTimestamp', Date.now());
+            })
+        .catch(error => {
+            this.updateLastUpdatedOnError(error);
+        });
+    }
+  }
+
+  updateLastUpdatedOnSuccess = (lastUpdatedValue) => {
+      this.setState(
+          prevState => {
+              let lastUpdated = prevState.lastUpdated;
+              let lastUpdatedStatus = prevState.lastUpdatedStatus;
+      
+              lastUpdated = lastUpdatedValue;
+              lastUpdatedStatus = {status: "success",
+                                  errorMessage: null};
+              return {lastUpdated, lastUpdatedStatus};
+          }
+      )
+  }
+
+  updateLastUpdatedOnError = (error) => {
+      this.setState(
+          prevState => {
+              let lastUpdated = prevState.lastUpdated;
+              let lastUpdatedStatus = prevState.lastUpdatedStatus;
+      
+              lastUpdated = null;
+              lastUpdatedStatus = {status: "error",
+                                  errorMessage: error.message};
+              return {lastUpdated, lastUpdatedStatus};
+          }
+      );
   }
 
   refresh = () => {
@@ -187,8 +251,8 @@ class Calculator extends Component {
       <>
         <Row>
           <Col span={8}>
-            <Fiat fiatCurrency={this.state.currentFiat} 
-                handleChange={this.setNewFiatCurrency}
+            <FiatDropdown fiatCurrency={this.state.currentFiat} 
+                          handleChange={this.setNewFiatCurrency}
             /> 
           </Col>
           <Col span={1} offset={15}>
@@ -197,7 +261,11 @@ class Calculator extends Component {
         </Row>
         <br/>
         <div>
-          <LastBitcoinInUSDRate/>  
+          <BitcoinInUSD USDStatus={this.state.exchangeRatesStatus["USD"]}
+                        USDValue={this.state.exchangeRates["USD"]}
+                        lastUpdatedStatus={this.state.lastUpdatedStatus}
+                        lastUpdated={this.state.lastUpdated} 
+          />  
         </div>
         <br/>
         <div>
